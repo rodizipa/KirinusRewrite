@@ -3,7 +3,7 @@ from discord import Embed,Color
 
 
 async def ex(message, client):
-    if message.channel.id == 167280538695106560 or message.channel.id == 397969460297990144:
+    if message.channel.id == 167280538695106560 or message.channel.id == 397969460297990144 or message.channel.id == 418098311669743637:
         parsed_message = message.content.replace(CONFIG.PREFIX + "raid", "")[1:]
         parsed_list = parsed_message.lower().split(" ")
         m = await message.channel.send("@here")
@@ -12,12 +12,25 @@ async def ex(message, client):
             author = message.mentions[0].display_name
 
         em = Embed(title="Raid alert!", color = Color.dark_red(), description="@here {} found a raid!".format(author), timestamp=datetime.datetime.utcnow())
+        em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418781949465722880/dorrow_cleo.png")
 
         if parsed_list[0] == 'aria':
             em.color = Color.gold()
             em.title = "Colored Stage!!!"
             em.description = "@here A Wild Aria Appears! Ask {} for the pokeballs".format(author)
             em.set_image(url="https://cdn.discordapp.com/emojis/372407902826135552.png")
+
+        elif parsed_list[0] == 'cleo' or parsed_list[0] == 'cleopatra':
+            em.color = Color.gold()
+            em.title = "Kneel Before Your Queen"
+            em.description = "@here Cleo wants to conquer the city. Join {} and show her that here isn't Egypt.".format(author)
+            em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418781949465722880/dorrow_cleo.png")
+            
+        elif parsed_list[0] == 'slime' or parsed_list[0] == 'pancakes':
+            em.color = Color.gold()
+            em.title = "Pancakes Wants To Eat The World (Again)"
+            em.description = "@here.Pancakes thinks that she is kirby, {} said that she is not. Now we just need judges".format(author)
+            em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418594680528437278/something_smaller.png")
 
         elif parsed_list[0] == 'morgan':
             em.title = "I-It's not like i want to serve you"
@@ -58,9 +71,11 @@ async def ex(message, client):
         else:
             if len(parsed_list) > 0 and parsed_list[0] != "":
                 em.description = "@here {} found a **{}**!".format(author, parsed_list[0])
-
+                if parsed_list[0].startswith("<"):
+                    em.description = "@here {} found a raid!".format(author)
+                    
         if len(parsed_list) > 1 :
-            if parsed_list[1].startswith("<") == False:
+            if not parsed_list[1].startswith("<"):
                 em_edit = em.description
                 em.description = em_edit + "\nAlso, it appears to be lvl **{}**.\n".format(parsed_list[1])
 

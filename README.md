@@ -13,13 +13,12 @@ Here is a overview of Kirinus Functions.
 
 Learn more about Kirinus commands:
 
-* Raid
+* [Raid](#raid-command)
 * World Boss (not yet on live version)
 * Fun stuff
 
 
 ### Raid Command
-
 To use raid command is very simple:
 
 ```?raid [optional:name] [optional: lv] [optional: mention]```

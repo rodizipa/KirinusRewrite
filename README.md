@@ -1,4 +1,4 @@
-# KirinusRewrite
+# Kirinus Rewrite
 
 Destiny child stuff related bot based using discord.py rewrite API wrapper.
 

@@ -47,7 +47,7 @@ Currently the only names that don't have a pic associated are *zelos* and *rudol
 
 **Important:** The raid name is the only argument that have a position fixed and must be the 2nd argument if you want to add other arguments.
 
-####Adding mention [raid owner] field:
+#### Adding mention [raid owner] field:
 
 Suppose that u found another person raid, how do you set the owner? Simple, just mention him on the command and Kirinus will do all the hard work.
 

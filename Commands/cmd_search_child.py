@@ -6,7 +6,7 @@ from discord import Embed, Color
 
 async def ex(message, client):
     if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
-        async with open("Commands/kdbchilds.csv", "r") as db_childs_file:
+        with open("Commands/kdbchilds.csv", "r") as db_childs_file:
             reader = csv.DictReader(db_childs_file)
 
             # if the keyword was found

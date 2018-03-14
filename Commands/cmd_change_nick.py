@@ -9,5 +9,5 @@ async def ex(message, client):
 
         await message.mentions[0].edit(nick=list[1])
     else:
-        message.author.send("You don't have permissions to do that.")
+        await message.author.send("You don't have permissions to do that.")
         await message.delete()

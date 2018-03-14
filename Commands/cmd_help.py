@@ -12,6 +12,6 @@ async def ex(message, client):
                     "**?choose <term1>, <term2>[, <term whatever>].** Chooses a option for you. Note that terms are separated by commas\n\n"
                     "**?child <name>:** I'll search the child on my database (Child name ignores case, names with space needs "
                     "to keep the space. Ex:?child sang ah.\n\n"
-                    "**?raid [optional:raid_id] [optional:raid_level] [optional:raid owner (set up by mentioning the user)]:** Faster and cooler way of announcing raids. [Exclusive to raid channel]"
+                    "**?raid read the doc: https://rodizipa.github.io/KirinusRewrite/"
         ).set_image(url="https://i.imgur.com/vqF3d4O.png"))
     await message.delete()

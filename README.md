@@ -14,7 +14,7 @@ Here is a overview of Kirinus Functions.
 Learn more about Kirinus commands:
 
 * [Raid](#raid-command)
-* World Boss (not yet on live version)
+* [World Boss](#world-boss-command) (beta)
 * Fun stuff
 
 
@@ -70,3 +70,10 @@ gives back:
 ![lvl field img](https://rodizipa.gitbooks.io/kirinus-docs/content/assets/Screenshot_3.png)
 
 
+### World Boss Command
+
+This command makes the reset call automatic, so you don't have to bother.
+
+`?wb start/stop`
+
+Kirinus will give a initial alert and will keep sending ticket alerts each 2 hours.

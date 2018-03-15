@@ -4,7 +4,8 @@ from time import gmtime, strftime
 import CONFIG
 
 
-perma_name = False
+wb_status = False
+wb_first_call = False
 
 
 #importing commands
@@ -33,7 +34,7 @@ class MyClient(discord.Client):
         super().__init__(*args, **kwargs)
 
         # create the background task and run it in the background
-        self.bg_task = self.loop.create_task(self.my_background_task())
+        self.bg_task = self.loop.create_task(self.world_boss_task())
 
     async def on_ready(self):
         print(self.user.name + " online!")
@@ -42,33 +43,37 @@ class MyClient(discord.Client):
 
         await self.change_presence(game=discord.Game(name='?help or Die!'))
 
-    async def my_background_task(self):
+    async def  world_boss_task(self):
         await self.wait_until_ready()
-        global perma_name
-        channel = self.get_channel(242845451739463681) # general channel to catch the guild
-        perma_user = channel.guild.get_member(202591264510574592) #user id koji
-        perma_new_name = "Failure 2.0"
-        perma_user2 = channel.guild.get_member(186869907898499074) #blake
+        global wb_status
+        global wb_first_call
+        wb_channel = self.get_channel(167280538695106560) # general channel to catch the guild
 
         while not self.is_closed():
-            while perma_name is True:
-                if perma_user.display_name is not perma_new_name:
-                    await perma_user.edit(nick=perma_new_name) #permanick
-                if perma_user2.display_name is not "Koji 2.0":
-                    await perma_user2.edit(nick="Koji 2.0")
-            await asyncio.sleep(5) # task runs every 5 seconds
+            while wb_status is True:
+                if wb_first_call is True:
+                    await wb_channel.send("@here World Boss Started!!!")
+                    wb_first_call = False
+                    await asyncio.sleep(7200)
+                else:
+                    await wb_channel.send("@here ticket reset!")
+                    await asyncio.sleep(7200)
+
+            await asyncio.sleep(1) #1s
 
     async def on_message(self, message):
 
-        if message.content.startswith('?permaname'):
+        if message.content.startswith('?wb'):
             if message.author.id == 114010253938524167:
-                parsed_message = message.content.replace("?permaname", "")[1:]
-                global perma_name
-                if parsed_message == "True":
-                    perma_name = True
-                elif parsed_message == "False":
-                    perma_name = False
-            await asyncio.sleep(3)
+                parsed_message = message.content.replace("?wb", "")[1:]
+                global wb_first_call
+                global wb_status
+                if parsed_message == "start":
+                    wb_status = True
+                    wb_first_call = True
+                elif parsed_message == "stop":
+                    wb_status = False
+                    message.channel.send("@here World Boss is Dead.")
             await message.delete()
 
         elif message.content.startswith(CONFIG.PREFIX) and not message.author == client.user:

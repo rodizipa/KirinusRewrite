@@ -79,7 +79,7 @@ This command makes the reset call automatic, so you don't have to bother.
 
 Kirinus will give a initial alert and will keep sending ticket alerts each 2 hours.
 
-###Quote Command
+### Quote Command
 
 Give kirinus a tag and she'll reply with the assigned answer. For this you only need to use:
 

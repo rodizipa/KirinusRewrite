@@ -15,6 +15,7 @@ Learn more about Kirinus commands:
 
 * [Raid](#raid-command)
 * [World Boss](#world-boss-command) (beta)
+* [Quotes](#quote-command)
 * Fun stuff
 
 
@@ -77,3 +78,37 @@ This command makes the reset call automatic, so you don't have to bother.
 `?wb start/stop`
 
 Kirinus will give a initial alert and will keep sending ticket alerts each 2 hours.
+
+###Quote Command
+
+Give kirinus a tag and she'll reply with the assigned answer. For this you only need to use:
+
+`?quote <tag>`
+
+Using `?quote docs` will give you a link for this page. Easy right?
+
+#### Listing available quotes:
+
+If you use only quote, or type help/list on second term, kirinus will dm you with the available tags.
+
+`?quote` or `?quote help` or `?quote list`
+
+#### Adding quotes:
+
+Kirinus has ability of adding quotes. For this you only need to obey a certain format.
+
+`?quote add <tag> <content>`
+
+note that on content with spaces, you need to use quotes, otherwise kirinus will only register the first word.
+
+`?quote add test "Some Stuff"`
+
+`Kirinus: Some Stuff`
+
+if you used:
+
+`?quote add test Some Stuff`
+
+`Kirinus:Some`
+
+**Obs**: Kirinus can't replace existing tags. (For now.)

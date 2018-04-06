@@ -47,7 +47,7 @@ class MyClient(discord.Client):
         await self.wait_until_ready()
         global wb_status
         global wb_first_call
-        wb_channel = self.get_channel(167280538695106560) # general channel to catch the guild
+        wb_channel = self.get_channel(423263557828739073) # general channel to catch the guild
 
         while not self.is_closed():
             while wb_status is True:
@@ -64,16 +64,15 @@ class MyClient(discord.Client):
     async def on_message(self, message):
 
         if message.content.startswith('?wb'):
-            if message.author.id == 114010253938524167:
-                parsed_message = message.content.replace("?wb", "")[1:]
-                global wb_first_call
-                global wb_status
-                if parsed_message == "start":
-                    wb_status = True
-                    wb_first_call = True
-                elif parsed_message == "stop":
-                    wb_status = False
-                    message.channel.send("@here World Boss is Dead.")
+            parsed_message = message.content.replace("?wb", "")[1:]
+            global wb_first_call
+            global wb_status
+            if parsed_message == "start":
+                wb_status = True
+                wb_first_call = True
+            elif parsed_message == "stop":
+                wb_status = False
+                message.channel.send("@here World Boss is Dead.")
             await message.delete()
 
         elif message.content.startswith(CONFIG.PREFIX) and not message.author == client.user:

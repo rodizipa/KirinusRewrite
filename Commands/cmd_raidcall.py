@@ -118,7 +118,7 @@ async def ex(message, client):
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438412893552640/santa.png")
             em.color = Color.dark_blue()
 
-        elif parsed_list[0] == 'willow':
+        elif parsed_list[0] == 'willow' or parsed_list[0] =='barchelor':
             em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438249588326400/willow.png")
             em.color = Color.dark_green()
@@ -159,7 +159,10 @@ async def ex(message, client):
             em.color = Color.dark_green()
 
         elif parsed_list[0]:
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            if parsed_list[0] == message.mentions[0]:
+                em.description = "@here {} found a raid.".format(author)
+            else:
+                em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
 
 
         if len(parsed_list) > 1:

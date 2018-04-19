@@ -1,9 +1,10 @@
 import CONFIG
 import csv
-from discord import Embed
+from discord import Embed, Color
 import asyncio
 import shlex
 
+# melhorias: replace item, 2nd page listing, removing item, listing creator nick.
 
 async def ex(message, client):
     parsed_message = message.content.replace(CONFIG.PREFIX + "quote", "")[1:]
@@ -19,10 +20,10 @@ async def ex(message, client):
         with open("Commands/quotes.csv", newline='', encoding='utf-8') as quotes_file:
             reader = csv.DictReader(quotes_file)
             for line in reader:
-                if counter <= 1:
+                if counter <= 3:
                     tag_list.append(line["invoke"])
                     counter += 1
-                elif counter == 2:
+                elif counter == 4:
                     tag_list.append(line["invoke"])
                     counter = 0
                     wrapper_list.append(', '.join(str(tag) for tag in tag_list))
@@ -52,6 +53,7 @@ async def ex(message, client):
             m = await message.channel.send("Tag added.")
             await asyncio.sleep(5)
             await m.delete()
+            await message.delete()
 
 # find item
     else:
@@ -62,7 +64,13 @@ async def ex(message, client):
 
             for line in reader:
                 if line["invoke"] == parsed_list[0]:
-                    await message.channel.send(line["text"])
+                    if line["text"].startswith("http") or line["text"].startswith(" http"):
+                        em = Embed(title=line["invoke"], color=Color.dark_blue())
+                        em.set_image(url=line["text"])
+                        await message.channel.send(embed=em)
+                        await message.delete()
+                    else:
+                        await message.channel.send(line["text"])
                     found = True
                     break
 
@@ -70,3 +78,4 @@ async def ex(message, client):
                 m = await message.channel.send("Tag not found.")
                 await asyncio.sleep(5)
                 await m.delete()
+                await message.delete()

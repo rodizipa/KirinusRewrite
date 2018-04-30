@@ -38,6 +38,9 @@ Use: `?maint`
 
 updating maint time (for mods):
 `?maint add "MM/DD hh:mm"`
+
+Note that kirinus only accepts kst time.
+
 ### Raid Command
 To use raid command is very simple:
 

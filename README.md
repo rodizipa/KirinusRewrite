@@ -17,7 +17,7 @@ Learn more about Kirinus commands:
 * [World Boss](#world-boss-command) (beta)
 * [Quotes](#quote-command)
 * [Reset](#reset-countdown)
-* [Maint]
+* [Maint](#maint)
 * Fun stuff
 
 ### Reset Countdown
@@ -28,7 +28,7 @@ Use:
 
 ![simple reset example](https://cdn.discordapp.com/attachments/242845451739463681/440325135749349377/unknown.png)
 
-### Maint:
+### Maint
 
 Says when maint will start/started.
 

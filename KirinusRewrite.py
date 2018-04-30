@@ -10,7 +10,7 @@ wb_first_call = False
 
 #importing commands
 from Commands import cmd_search_child, cmd_help, cmd_version, cmd_8ball, cmd_choose, cmd_quote, cmd_say, cmd_purge,\
-    cmd_change_nick,cmd_raidcall, cmd_emoji, cmd_assign_role
+    cmd_change_nick,cmd_raidcall, cmd_emoji, cmd_assign_role, cmd_timer
 
 
 cmdmap = {
@@ -26,6 +26,7 @@ cmdmap = {
     "raid": cmd_raidcall,
     "emo": cmd_emoji,
     "arole" :cmd_assign_role,
+    "reset" :cmd_timer
 }
 
 
@@ -41,7 +42,7 @@ class MyClient(discord.Client):
         print(self.user.id)
         print('------')
 
-        await self.change_presence(game=discord.Game(name='?help or Die!'))
+        await self.change_presence(activity=discord.Game('?help or Die!'))
 
     async def  world_boss_task(self):
         await self.wait_until_ready()

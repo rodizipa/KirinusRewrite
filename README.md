@@ -16,8 +16,16 @@ Learn more about Kirinus commands:
 * [Raid](#raid-command)
 * [World Boss](#world-boss-command) (beta)
 * [Quotes](#quote-command)
+* [Reset](#reset-countdown  )
 * Fun stuff
 
+### Reset Countdown
+Gives the countdown till the next reset.
+
+Use:
+`?reset`
+
+![simple reset example](https://cdn.discordapp.com/attachments/242845451739463681/440325135749349377/unknown.png)
 
 ### Raid Command
 To use raid command is very simple:

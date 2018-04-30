@@ -10,7 +10,7 @@ wb_first_call = False
 
 #importing commands
 from Commands import cmd_search_child, cmd_help, cmd_version, cmd_8ball, cmd_choose, cmd_quote, cmd_say, cmd_purge,\
-    cmd_change_nick,cmd_raidcall, cmd_emoji, cmd_assign_role, cmd_timer
+    cmd_change_nick,cmd_raidcall, cmd_emoji, cmd_assign_role, cmd_timer, cmd_maint
 
 
 cmdmap = {
@@ -26,7 +26,8 @@ cmdmap = {
     "raid": cmd_raidcall,
     "emo": cmd_emoji,
     "arole" :cmd_assign_role,
-    "reset" :cmd_timer
+    "reset" :cmd_timer,
+    "maint" : cmd_maint,
 }
 
 

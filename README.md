@@ -16,7 +16,8 @@ Learn more about Kirinus commands:
 * [Raid](#raid-command)
 * [World Boss](#world-boss-command) (beta)
 * [Quotes](#quote-command)
-* [Reset](#reset-countdown  )
+* [Reset](#reset-countdown)
+* [Maint]
 * Fun stuff
 
 ### Reset Countdown
@@ -27,6 +28,14 @@ Use:
 
 ![simple reset example](https://cdn.discordapp.com/attachments/242845451739463681/440325135749349377/unknown.png)
 
+### Maint:
+
+Says when maint will start/started.
+
+Use: `?maint`
+
+updating maint time (for mods):
+`?maint add "MM/DD hh:mm"`
 ### Raid Command
 To use raid command is very simple:
 

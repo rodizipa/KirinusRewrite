@@ -12,8 +12,8 @@ async def ex(message, client):
     reset_countdown = reset.diff(now)
 
     em = Embed(description=":alarm_clock: The next reset will happen in {}. :alarm_clock:".format(reset_countdown), color=Color.blue())
-    await asyncio.sleep(1)
-    await message.delete()
+
     m = await message.channel.send(embed = em)
     await asyncio.sleep(20)
+    await message.delete()
     await m.delete()

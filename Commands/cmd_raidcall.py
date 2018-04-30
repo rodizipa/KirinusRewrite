@@ -159,11 +159,10 @@ async def ex(message, client):
             em.color = Color.dark_green()
 
         elif parsed_list[0]:
-            if parsed_list[0] == message.mentions[0]:
+            if parsed_list[0].startswith('<@!'):
                 em.description = "@here {} found a raid.".format(author)
             else:
                 em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
-
 
         if len(parsed_list) > 1:
             found = False

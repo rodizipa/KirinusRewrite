@@ -18,7 +18,9 @@ Learn more about Kirinus commands:
 * [Quotes](#quote-command)
 * [Reset](#reset-countdown)
 * [Maint](#maint)
-* Fun stuff
+* [8 Ball](#8-ball)
+* [Choose](#choose)
+* [Child Search](#child-search)
 
 ### Reset Countdown
 Gives the countdown till the next reset.
@@ -30,7 +32,7 @@ Use:
 
 ### Maint
 
-Says when maint will start/started.
+Works like reset command but will tell you when maint will start/started.
 
 Use: `?maint`
 
@@ -129,3 +131,21 @@ if you used:
 `Kirinus:Some`
 
 **Obs**: Kirinus can't replace existing tags. (For now.)
+
+### 8 ball
+Ask Kirinus about your fortune.
+
+use: `?8ball <question>`
+
+### choose
+Make Kirinus choose something for you.
+
+use: `?choose <first choice>, <second choice>, <go on if u want>`
+
+### Child Search
+Search for a child skillset by using it's name as argument.
+
+use: `?child name`. Ex: `?child mammon`
+
+Obs: Some childs accept alliases, spaced names must include the whitespace like `?child sang ah`. 
+If you can't find the child check [Kirinus Database KR.](https://docs.google.com/spreadsheets/d/1SaZ_QXHhqbRWHYSjY9_g5-TKom-ArxNrjhO_J8DJL7I/edit#gid=0)

@@ -99,6 +99,8 @@ This command makes the reset call automatic, so you don't have to bother.
 
 `?wb start/stop`
 
+`?wb start <id>` ex: `?wb start aria`
+
 Kirinus will give a initial alert and will keep sending ticket alerts each 2 hours.
 
 ### Quote Command

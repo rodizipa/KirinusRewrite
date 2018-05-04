@@ -41,20 +41,60 @@ async def quote(message):
 # add item
     elif parsed_list[0] == "add":
         found = False
+        line_list = []
         with open("Commands/quotes.csv", newline='', encoding='utf-8') as quotes_file:
             reader = csv.DictReader(quotes_file)
             for line in reader:
                 if line["invoke"] == parsed_list[1]:
-                    await message.channel.send("Row Replacement not yet implemented.")
                     found = True
+                    line_list.append("{},{}".format(line["invoke"], parsed_list[2]))
+                else:
+                    line_list.append("{},{}".format(line["invoke"], line["text"]))
+
+        if found:
+            with open("Commands/quotes.csv", 'w', encoding='utf-8') as quotes_file:
+                quotes_file.write("invoke,text\n")
+                for line in line_list:
+                    quotes_file.write(line+'\n')
+            m = await message.channel.send("Tag updated.")
+
         if not found:
             with open("Commands/quotes.csv", "a") as quotes_file:
-                quotes_file.write('\n{}, {}'.format(parsed_list[1], parsed_list[2]))
-
+                quotes_file.write('\n{},{}'.format(parsed_list[1], parsed_list[2]))
             m = await message.channel.send("Tag added.")
-            await asyncio.sleep(5)
-            await m.delete()
-            await message.delete()
+
+        await asyncio.sleep(5)
+        await m.delete()
+        await message.delete()
+
+# remove item
+    elif parsed_list[0] == "remove":
+        line_list = []
+        found = False
+
+        with open("Commands/quotes.csv", newline='', encoding='utf-8') as quotes_file:
+            reader = csv.DictReader(quotes_file)
+            for line in reader:
+                if line["invoke"] == parsed_list[1]:
+                    pass
+                    found = True
+                else:
+                    line_list.append("{},{}".format(line["invoke"], line["text"]))
+
+        if found:
+            with open("Commands/quotes.csv", 'w', encoding='utf-8') as quotes_file:
+                quotes_file.write("invoke,text\n")
+                for line in line_list:
+                    quotes_file.write(line+'\n')
+            m = await message.channel.send("Tag removed.")
+        else:
+            m = await message.channel.send("Tag not found.")
+
+        await asyncio.sleep(5)
+        await m.delete()
+        await message.delete()
+
+
 
 # find item
     else:

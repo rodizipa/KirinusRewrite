@@ -16,6 +16,8 @@ Learn more about Kirinus commands:
 * [Raid](#raid-command)
 * [World Boss](#world-boss-command) (beta)
 * [Quotes](#quote-command)
+    - [add/edit quote](#adding-quotes:)
+    - [remove quote](#removing-a-quote:)
 * [Reset](#reset-countdown)
 * [Maint](#maint)
 * [8 Ball](#8-ball)
@@ -135,7 +137,11 @@ if you used:
 
 `Kirinus:Some`
 
-**Obs**: Kirinus can't replace existing tags. (For now.)
+**obs**: To edit a existent quote, just use `?quote add <tag> <new text>`
+
+#### Removing a quote:
+
+`?quote remove <tag>`
 
 ### 8 ball
 Ask Kirinus about your fortune.

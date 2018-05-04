@@ -2,9 +2,10 @@ import CONFIG
 import csv
 from discord import Embed, Color
 
-#description = "Search Child Info on Database"
+# description = "Search Child Info on Database"
 
-async def ex(message, client):
+
+async def child_search(message):
     if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
         with open("Commands/kdbchilds.csv", "r") as db_childs_file:
             reader = csv.DictReader(db_childs_file)
@@ -29,7 +30,7 @@ async def ex(message, client):
                     elif line["element"] == "Forest":
                         element_color = Color.dark_green()
 
-                    #creates the embed card
+                    # creates the embed card
                     embed = Embed(color = element_color, description=line["rank"])
                     embed.title = line["Name"]
                     embed.add_field(name="Type:", value=line["type"] + "\n", inline=True)

@@ -3,90 +3,97 @@ import asyncio
 from time import gmtime, strftime
 import CONFIG
 
+from Commands import db, utils, fun, meme, raid, admin, timer
 
-wb_status = False
-wb_first_call = False
-
-
-#importing commands
-from Commands import cmd_search_child, cmd_help, cmd_version, cmd_8ball, cmd_choose, cmd_quote, cmd_say, cmd_purge,\
-    cmd_change_nick,cmd_raidcall, cmd_emoji, cmd_assign_role, cmd_timer, cmd_maint
-
-
-cmdmap = {
-    "child": cmd_search_child,
-    "help": cmd_help,
-    "version": cmd_version,
-    "8ball": cmd_8ball,
-    "choose": cmd_choose,
-    "quote": cmd_quote,
-    "say": cmd_say,
-    "purge": cmd_purge,
-    "changenick": cmd_change_nick,
-    "raid": cmd_raidcall,
-    "emo": cmd_emoji,
-    "arole" :cmd_assign_role,
-    "reset" :cmd_timer,
-    "maint" : cmd_maint,
+cmd_map = {
+    "child": db.child_search,
+    "help": utils.help,
+    "8ball": fun.eight_ball,
+    "choose": fun.choose,
+    "quote": meme.quote,
+    "say": utils.say,
+    "purge": admin.purge,
+    "changenick": admin.change_nick,
+    "raid": raid.raid,
+    "emo": meme.emoji,
+    "arole": admin.arole,
+    "reset": timer.reset,
+    "maint": timer.maint,
+    "rrole": admin.rrole,
 }
+
+
+class WorldBoss:
+    status = False
+    channel = None
+    first_run = False
+    reset_time = 10
 
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # create the background task and run it in the background
+        # create the world_boss task and run it in the background
         self.bg_task = self.loop.create_task(self.world_boss_task())
 
     async def on_ready(self):
         print(self.user.name + " online!")
         print(self.user.id)
         print('------')
-
         await self.change_presence(activity=discord.Game('?help or Die!'))
 
-    async def  world_boss_task(self):
+    async def world_boss_task(self):
         await self.wait_until_ready()
-        global wb_status
-        global wb_first_call
-        wb_channel = self.get_channel(423263557828739073) # general channel to catch the guild
+        # WorldBoss.channel = self.get_channel(423263557828739073)
+        WorldBoss.channel = self.get_channel(167280538695106560)
 
         while not self.is_closed():
-            while wb_status is True:
-                if wb_first_call is True:
-                    await wb_channel.send("@here World Boss Started!!!")
-                    wb_first_call = False
-                    await asyncio.sleep(7200)
+            while WorldBoss.status is True:
+                if WorldBoss.first_run is True:
+                    WorldBoss.first_run = False
                 else:
-                    await wb_channel.send("@here ticket reset!")
-                    await asyncio.sleep(7200)
-
-            await asyncio.sleep(1) #1s
+                    m = await WorldBoss.channel.send("@here Ticket reset!")
+                    await m.delete()
+                    await WorldBoss.channel.send(embed = raid.wb_ticket())
+                await asyncio.sleep(WorldBoss.reset_time)
+            await asyncio.sleep(1)  # 1s
 
     async def on_message(self, message):
 
         if message.content.startswith('?wb'):
             parsed_message = message.content.replace("?wb", "")[1:]
-            global wb_first_call
-            global wb_status
-            if parsed_message == "start":
-                wb_status = True
-                wb_first_call = True
-            elif parsed_message == "stop":
-                wb_status = False
-                message.channel.send("@here World Boss is Dead.")
+            parsed_message = parsed_message.lower().split()
+
+            if parsed_message[0] == "start":
+                WorldBoss.first_run = True
+                WorldBoss.status = True
+                if len(parsed_message) > 1:
+                    m = await WorldBoss.channel.send("@here World Boss started! {}".format(parsed_message[1]))
+                    await m.delete()
+                    await WorldBoss.channel.send(embed=raid.wb_card(parsed_message[1]))
+                else:
+                    m = await WorldBoss.channel.send("@here World Boss started!")
+                    await m.delete()
+                    await WorldBoss.channel.send(embed=raid.wb_card("default"))
+
+            elif parsed_message[0] == "stop":
+                m = await WorldBoss.channel.send("@here World Boss died")
+                await m.delete()
+                await WorldBoss.channel.send(embed= raid.wb_died())
+                WorldBoss.status = False
+            await asyncio.sleep(1)
             await message.delete()
 
         elif message.content.startswith(CONFIG.PREFIX) and not message.author == client.user:
             invoke = message.content.split(" ")[0].replace(CONFIG.PREFIX, "", 1)
-            command_string =""
-            cmd = cmdmap[invoke]
+            cmd = cmd_map[invoke]
 
             try:
-                await cmd.ex(message, client)
+                await cmd(message)
             except Exception as e:
-                print(e.__doc__)
                 print(e.__name__)
+                print(e.__doc__)
 
             print(strftime("[%d.%m.%Y %H:%M:%S]",
                            gmtime()) + " [COMMAND] \"" + message.content + "\" by " + message.author.name)

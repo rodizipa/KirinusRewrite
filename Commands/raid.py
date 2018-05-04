@@ -196,38 +196,38 @@ def wb_card(wb_id):
         em.color= Color.dark_gold()
 
     elif wb_id == "bari":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750419979501575/WB_bari.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796893765533711/WB_bari.png")
         em.color = Color.dark_blue()
 
     elif wb_id == "khepri":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750452065927169/WB_Khepri.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796938992451584/WB_Khepri.png")
         em.color = Color.dark_purple()
 
     elif wb_id == "krampus":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750452271448065/WB_Krampus.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796939772723212/WB_Krampus.png")
         em.color = Color.dark_green()
 
     elif wb_id == "morgan":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750460957982730/WB_morgan.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796946265636864/WB_morgan.png")
 
     elif wb_id == "nicole":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750461100457995/WB_nicole.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796946282414090/WB_nicole.png")
         em.color = Color.dark_green()
 
     elif wb_id == "slime":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750463684018186/WB_Slime.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796942532706304/WB_Slime.png")
         em.color = Color.dark_gold()
 
     elif wb_id == "rita":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750466515304458/WB_Rita.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796950090579988/WB_Rita.png")
         em.color = Color.dark_purple()
 
     elif wb_id == "isolde" or wb_id == "iseult" or wb_id == "spiku":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750466951512064/WB_Spiku.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796948639612928/WB_Spiku.png")
         em.color = Color.dark_blue()
 
     elif wb_id == "thetis":
-        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750468733960193/WB_thetis.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796950241574912/WB_thetis.png")
         em.color = Color.dark_blue()
 
     return em

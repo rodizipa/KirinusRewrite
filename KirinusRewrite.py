@@ -27,7 +27,7 @@ class WorldBoss:
     status = False
     channel = None
     first_run = False
-    reset_time = 10
+    reset_time = 7200  # actual time: 2h
 
 
 class MyClient(discord.Client):
@@ -52,22 +52,24 @@ class MyClient(discord.Client):
             while WorldBoss.status is True:
                 if WorldBoss.first_run is True:
                     WorldBoss.first_run = False
+                    await asyncio.sleep(WorldBoss.reset_time)
                 else:
                     m = await WorldBoss.channel.send("@here Ticket reset!")
                     await m.delete()
                     await WorldBoss.channel.send(embed = raid.wb_ticket())
-                await asyncio.sleep(WorldBoss.reset_time)
+                    await asyncio.sleep(WorldBoss.reset_time)
             await asyncio.sleep(1)  # 1s
 
     async def on_message(self, message):
 
-        if message.content.startswith('?wb'):
+        if message.content.startswith('?wb') and not message.author == client.user:
             parsed_message = message.content.replace("?wb", "")[1:]
             parsed_message = parsed_message.lower().split()
 
             if parsed_message[0] == "start":
                 WorldBoss.first_run = True
                 WorldBoss.status = True
+
                 if len(parsed_message) > 1:
                     m = await WorldBoss.channel.send("@here World Boss started! {}".format(parsed_message[1]))
                     await m.delete()
@@ -82,6 +84,7 @@ class MyClient(discord.Client):
                 await m.delete()
                 await WorldBoss.channel.send(embed= raid.wb_died())
                 WorldBoss.status = False
+
             await asyncio.sleep(1)
             await message.delete()
 

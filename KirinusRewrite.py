@@ -20,6 +20,8 @@ cmd_map = {
     "reset": timer.reset,
     "maint": timer.maint,
     "rrole": admin.rrole,
+    "timer": timer.timer,
+    "tierlist": utils.tierlist,
 }
 
 

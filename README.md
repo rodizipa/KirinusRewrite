@@ -18,11 +18,26 @@ Learn more about Kirinus commands:
 * [Quotes](#quote-command)
     - [add/edit quote](#adding-quotes:)
     - [remove quote](#removing-a-quote:)
+* [Timer](#timer)
+* [Tierlist](#tierlist)
 * [Reset](#reset-countdown)
 * [Maint](#maint)
 * [8 Ball](#8-ball)
 * [Choose](#choose)
 * [Child Search](#child-search)
+
+
+### Tierlist
+Returns the tierlist
+
+`?tierlist`
+
+### Timer 
+Returns the countdown till event. 
+
+`?timer MM/DD HH:mm`
+
+Not that the time need to be at kst.
 
 ### Reset Countdown
 Gives the countdown till the next reset.

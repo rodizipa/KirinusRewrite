@@ -19,3 +19,8 @@ async def say(message):
     await message.channel.send(parsed_message)
     await asyncio.sleep(5)
     await message.delete()
+
+async def tierlist(message):
+    await message.channel.send("**Tier List by Icuh**:https://docs.google.com/spreadsheets/d/1rw9sGeQAvYX76pC-nE7XwJ15Nxm1W_Sn8xr__ROvFuI/edit?usp=sharing")
+    await asyncio.sleep(5)
+    await message.delete()

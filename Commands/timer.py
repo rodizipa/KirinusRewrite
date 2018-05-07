@@ -64,3 +64,24 @@ async def maint(message):
             await asyncio.sleep(5)
             await message.delete()
             await m.delete()
+
+
+async def timer(message):
+    parsed_message = message.content.replace(CONFIG.PREFIX + "timer", "")[1:]
+    timer = pendulum.parse(parsed_message,tz='Asia/Seoul')
+    now = pendulum.now('Asia/Seoul')
+
+    if now > timer:
+        em = Embed(description=":alarm_clock: This event happened {} ago. :alarm_clock:".format(timer.diff(now)),
+                   color=Color.blue())
+        m = await message.channel.send(embed=em)
+        await asyncio.sleep(20)
+        await message.delete()
+        await m.delete()
+    else:
+        em = Embed(description=":alarm_clock: This event will happen in {}. :alarm_clock:".format(timer.diff(now)),
+                   color=Color.blue())
+        m = await message.channel.send(embed=em)
+        await asyncio.sleep(20)
+        await message.delete()
+        await m.delete()

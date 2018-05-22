@@ -2,12 +2,10 @@
 
 Destiny child stuff related bot based using discord.py rewrite API wrapper.
 
-Version 1.0 Kirinus Migrated to Discord.py Rewrite API!
-
 Here is a overview of Kirinus Functions.
 
 ## New Features!
-    * raid pics updated! Fancy raid pics on raid command
+    * 05/22 - Slap and coin function.
 
 ## Commands
 
@@ -23,6 +21,8 @@ Learn more about Kirinus commands:
 * [Reset](#reset-countdown)
 * [Maint](#maint)
 * [8 Ball](#8-ball)
+* [Slap](#slap:)
+* [coin](#coin:)
 * [Choose](#choose)
 * [Child Search](#child-search)
 
@@ -157,6 +157,16 @@ if you used:
 #### Removing a quote:
 
 `?quote remove <tag>`
+
+### Slap:
+Kirinus will deliver your slap to someone else.
+
+use: `?slap <mention user>`
+
+### Coin:
+Flip a coin.
+
+use: `?coin`
 
 ### 8 ball
 Ask Kirinus about your fortune.

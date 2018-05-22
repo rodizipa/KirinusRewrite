@@ -3,18 +3,19 @@ from discord import Embed, Color
 
 
 async def raid(message):
-    if message.channel.id == 167280538695106560 or message.channel.id == 423263557828739073:
+    if message.channel.id == 167280538695106560 or message.channel.id == 443805043972505611:
         parsed_message = message.content.replace(CONFIG.PREFIX + "raid", "")[1:]
         parsed_list = parsed_message.lower().split(" ")
-        m = await message.channel.send("@here")
-        author = message.author.display_name
 
+        author = message.author.display_name
         if len(message.mentions) > 0:
             author = message.mentions[0].display_name
 
+        m = await message.channel.send("@here")
+
         em = Embed(title="Raid alert!", color=Color.dark_red(), description="@here {} found a raid!".format(author),
                    timestamp=datetime.datetime.utcnow())
-        em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418781949465722880/dorrow_cleo.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/448342259406995486/demeter.png")
 
         if parsed_list[0] == 'aria':
             em.color = Color.gold()
@@ -29,13 +30,17 @@ async def raid(message):
                 author)
             em.set_image(
                 url="https://cdn.discordapp.com/attachments/242845451739463681/418781949465722880/dorrow_cleo.png")
+
+        elif parsed_list[0] == 'demeter':
+            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/448342259406995486/demeter.png")
             for item in parsed_list:
                 if item == 'slayers' or item == 'slayer':
                     em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/420924635459092480/slayerscleo.png")
+                        url="https://cdn.discordapp.com/attachments/448341812055244817/448342167300341761/demeter_slayer.png")
 
         elif parsed_list[0] == 'slayer' or parsed_list[0] == 'slayers':
-            em.set_image(url='https://cdn.discordapp.com/attachments/167280538695106560/420924635459092480/slayerscleo.png')
+            em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/448342167300341761/demeter_slayer.png')
 
         elif parsed_list[0] == 'slime' or parsed_list[0] == 'pancakes':
             em.color = Color.gold()
@@ -189,6 +194,10 @@ def wb_card(wb_id):
 
     if wb_id == "apep":
         em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750398269784064/WB_apep.png")
+        em.color= Color.dark_gold()
+
+    elif wb_id == "aria":
+        em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
         em.color= Color.dark_gold()
 
     elif wb_id == "aria":

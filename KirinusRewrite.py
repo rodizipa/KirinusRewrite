@@ -22,6 +22,8 @@ cmd_map = {
     "rrole": admin.rrole,
     "timer": timer.timer,
     "tierlist": utils.tierlist,
+    "coin": fun.flip_coin,
+    "slap": fun.slap,
 }
 
 
@@ -47,8 +49,8 @@ class MyClient(discord.Client):
 
     async def world_boss_task(self):
         await self.wait_until_ready()
-        # WorldBoss.channel = self.get_channel(423263557828739073)
-        WorldBoss.channel = self.get_channel(167280538695106560)
+        WorldBoss.channel = self.get_channel(423263557828739073)
+        # WorldBoss.channel = self.get_channel(167280538695106560)
 
         while not self.is_closed():
             while WorldBoss.status is True:
@@ -91,7 +93,7 @@ class MyClient(discord.Client):
             await message.delete()
 
         elif message.content.startswith(CONFIG.PREFIX) and not message.author == client.user:
-            invoke = message.content.split(" ")[0].replace(CONFIG.PREFIX, "", 1)
+            invoke = message.content.split(" ")[0].replace(CONFIG.PREFIX, "", 1).lower()
             cmd = cmd_map[invoke]
 
             try:

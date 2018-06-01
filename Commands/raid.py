@@ -3,7 +3,7 @@ from discord import Embed, Color
 
 
 async def raid(message):
-    if message.channel.id == 167280538695106560 or message.channel.id == 443805043972505611:
+    if message.channel.id == 167280538695106560 or message.channel.id == 449061137523277834:
         parsed_message = message.content.replace(CONFIG.PREFIX + "raid", "")[1:]
         parsed_list = parsed_message.lower().split(" ")
 
@@ -13,7 +13,7 @@ async def raid(message):
 
         m = await message.channel.send("@here")
 
-        em = Embed(title="Raid alert!", color=Color.dark_red(), description="@here {} found a raid!".format(author),
+        em = Embed(title="Raid alert!", color=Color.dark_red(), description="@here {} found a/an raid!".format(author),
                    timestamp=datetime.datetime.utcnow())
         em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/448342259406995486/demeter.png")
 
@@ -32,7 +32,7 @@ async def raid(message):
                 url="https://cdn.discordapp.com/attachments/242845451739463681/418781949465722880/dorrow_cleo.png")
 
         elif parsed_list[0] == 'demeter':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/448342259406995486/demeter.png")
             for item in parsed_list:
                 if item == 'slayers' or item == 'slayer':
@@ -74,6 +74,11 @@ async def raid(message):
             em.color = Color.dark_green()
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438405054529537/krampus.png")
 
+        elif parsed_list[0] == 'abaddon' or parsed_list[0] == 'abadon':
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
+            em.color = Color.dark_green()
+            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/450101110850715648/abaddon.png")
+
         elif parsed_list[0] == 'frey':
             em.title = "Not him again."
             em.description = "@here {} wants to beat Frey. Motive: It's Frey.".format(author)
@@ -89,85 +94,85 @@ async def raid(message):
 
         elif parsed_list[0] == 'iseult' or parsed_list[0] == 'isolde':
             em.title = "Warning: Bombs ahead!"
-            em.description = "@here {} found a girl with a volleyball shouting **Spiku**. Keep your distance ~~or not~~. U've been warned.".format(
+            em.description = "@here {} found a/an girl with a volleyball shouting **Spiku**. Keep your distance ~~or not~~. U've been warned.".format(
                 author)
             em.color = Color.dark_blue()
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438528870383616/isolde.png")
 
         elif parsed_list[0] == 'verd' or parsed_list[0] == 'verdel':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438373009915924/verd.png")
 
         elif parsed_list[0] == 'mars':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438164578304015/Mars.png")
             em.color = Color.dark_purple()
 
         elif parsed_list[0] == 'neptune':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438171058372628/Neptune.png")
             em.color = Color.dark_gold()
 
         elif parsed_list[0] == 'saturn':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438173985996810/Saturn.png")
             em.color = Color.dark_blue()
 
         elif parsed_list[0] == 'bari':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438224753852416/bari.png")
             em.color = Color.dark_blue()
 
         elif parsed_list[0] == 'santa':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438412893552640/santa.png")
             em.color = Color.dark_blue()
 
         elif parsed_list[0] == 'willow' or parsed_list[0] =='barchelor':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438249588326400/willow.png")
             em.color = Color.dark_green()
 
         elif parsed_list[0] == 'tristan':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438531726573569/tristan.png")
             em.color = Color.dark_green()
 
         elif parsed_list[0] == 'apep':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438292902903851/apep.png")
             em.color = Color.dark_gold()
 
         elif parsed_list[0] == 'bast':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438297613369354/bastet.png")
             em.color = Color.dark_gold()
 
         elif parsed_list[0] == 'horus':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438314176413696/horus.png")
             em.color = Color.dark_gold()
 
         elif parsed_list[0] == 'hildr' or parsed_list[0] == 'hilde':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438365216899085/hildr.png")
             em.color = Color.dark_gold()
 
         elif parsed_list[0] == 'neman':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438463892226068/Neman.png")
             em.color = Color.dark_purple()
 
         elif parsed_list[0] == 'nicole':
-            em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+            em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
             em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438410498736148/nicole.png")
             em.color = Color.dark_green()
 
         elif parsed_list[0]:
             if parsed_list[0].startswith('<@'):
-                em.description = "@here {} found a raid.".format(author)
+                em.description = "@here {} found a/an raid.".format(author)
             else:
-                em.description = "@here {} found a **{}**".format(author, parsed_list[0].capitalize())
+                em.description = "@here {} found a/an **{}**".format(author, parsed_list[0].capitalize())
 
         if len(parsed_list) > 1:
             found = False
@@ -200,6 +205,10 @@ def wb_card(wb_id):
         em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
         em.color= Color.dark_gold()
 
+    elif wb_id == "cleo" or wb_id == "cleopatra":
+        em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/450101714062671872/cleowb.png")
+        em.color= Color.dark_gold()
+
     elif wb_id == "aria":
         em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
         em.color= Color.dark_gold()
@@ -218,6 +227,9 @@ def wb_card(wb_id):
 
     elif wb_id == "morgan":
         em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796946265636864/WB_morgan.png")
+
+    elif wb_id == "demeter":
+        em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/450101683729596417/demeterwb.png")
 
     elif wb_id == "nicole":
         em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/441796946282414090/WB_nicole.png")

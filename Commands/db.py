@@ -4,7 +4,6 @@ from discord import Embed, Color
 
 # description = "Search Child Info on Database"
 
-
 async def child_search(message):
     if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
         with open("Commands/kdbchilds.csv", "r") as db_childs_file:
@@ -13,12 +12,12 @@ async def child_search(message):
             # if the keyword was found
             found = False
             #filtered word
-            qchild = message.content.replace(CONFIG.PREFIX + "child", "")[1:]
+            qchild = message.content.lower().replace(CONFIG.PREFIX + "child", "")[1:]
 
             for line in reader:
-                if (line["id"] == qchild.lower()) or (line["alias1"]== qchild.lower()) or (line["alias2"] == qchild.lower()):
+                if qchild in (line["id"], line["alias1"],line["alias2"]):
                     found = True
-                    #Chooses the element color
+                    # Chooses the element color
                     if line["element"] == "Light":
                         element_color = Color.gold()
                     elif line["element"] == "Dark":

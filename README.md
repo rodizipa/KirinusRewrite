@@ -39,6 +39,12 @@ Returns the countdown till event.
 
 Not that the time need to be at kst.
 
+### Gatcha
+
+Gives you a random 5* child name that can be obtained or world boss if the argument `wb`  is present.
+
+Usage: `?gatcha` or `?gatcha wb`
+
 ### Reset Countdown
 Gives the countdown till the next reset.
 

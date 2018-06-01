@@ -24,6 +24,7 @@ cmd_map = {
     "tierlist": utils.tierlist,
     "coin": fun.flip_coin,
     "slap": fun.slap,
+    "gatcha": fun.gatcha,
 }
 
 
@@ -49,9 +50,8 @@ class MyClient(discord.Client):
 
     async def world_boss_task(self):
         await self.wait_until_ready()
-        WorldBoss.channel = self.get_channel(423263557828739073)
-        # WorldBoss.channel = self.get_channel(167280538695106560)
-
+        WorldBoss.channel = self.get_channel(449061137523277834)
+        #WorldBoss.channel = self.get_channel(167280538695106560)
         while not self.is_closed():
             while WorldBoss.status is True:
                 if WorldBoss.first_run is True:
@@ -104,6 +104,9 @@ class MyClient(discord.Client):
 
             print(strftime("[%d.%m.%Y %H:%M:%S]",
                            gmtime()) + " [COMMAND] \"" + message.content + "\" by " + message.author.name)
+
+        #elif message.author.id == 189370768541351937:  # Meme
+            #await fun.replace(message)
 
 
 client = MyClient()

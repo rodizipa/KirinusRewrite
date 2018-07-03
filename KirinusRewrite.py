@@ -25,6 +25,8 @@ cmd_map = {
     "coin": fun.flip_coin,
     "slap": fun.slap,
     "gatcha": fun.gatcha,
+    "findheretics": admin.estimated_inquisition,
+    "purgeheretics": admin.inquisition,
 }
 
 
@@ -51,7 +53,7 @@ class MyClient(discord.Client):
     async def world_boss_task(self):
         await self.wait_until_ready()
         WorldBoss.channel = self.get_channel(449061137523277834)
-        #WorldBoss.channel = self.get_channel(167280538695106560)
+        # WorldBoss.channel = self.get_channel(167280538695106560)
         while not self.is_closed():
             while WorldBoss.status is True:
                 if WorldBoss.first_run is True:

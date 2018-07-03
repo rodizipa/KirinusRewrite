@@ -4,18 +4,19 @@ from discord import Embed, Color
 
 # description = "Search Child Info on Database"
 
+
 async def child_search(message):
-    if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
+    if message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
         with open("Commands/kdbchilds.csv", "r") as db_childs_file:
             reader = csv.DictReader(db_childs_file)
 
             # if the keyword was found
             found = False
-            #filtered word
+            # filtered word
             qchild = message.content.lower().replace(CONFIG.PREFIX + "child", "")[1:]
 
             for line in reader:
-                if qchild in (line["id"], line["alias1"],line["alias2"]):
+                if qchild in (line["child_call"], line["alias1"],line["alias2"]):
                     found = True
                     # Chooses the element color
                     if line["element"] == "Light":
@@ -30,15 +31,15 @@ async def child_search(message):
                         element_color = Color.dark_green()
 
                     # creates the embed card
-                    embed = Embed(color = element_color, description=line["rank"])
-                    embed.title = line["Name"]
-                    embed.add_field(name="Type:", value=line["type"] + "\n", inline=True)
+                    embed = Embed(color=element_color, description=line["rank"])
+                    embed.title = line["name"]
+                    embed.add_field(name="Type:", value=line["role"] + "\n", inline=True)
                     embed.add_field(name="Element", value=line["element"]+ "\n", inline=True)
-                    embed.add_field(name="Leader Skill", value=line["Leader"]+ "\n", inline=False)
-                    embed.add_field(name="Auto Skill", value=line["Auto"]+ "\n", inline=False)
-                    embed.add_field(name="Tap Skill", value=line["Tap"]+ "\n", inline=False)
-                    embed.add_field(name="Slide Skill", value=line["Slide"]+ "\n",inline=False)
-                    embed.add_field(name="Drive Skill", value=line["Drive"]+ "\n", inline=False)
+                    embed.add_field(name="Leader Skill", value=line["leader_skill"]+ "\n", inline=False)
+                    embed.add_field(name="Auto Skill", value=line["auto_skill"]+ "\n", inline=False)
+                    embed.add_field(name="Tap Skill", value=line["tap_skill"]+ "\n", inline=False)
+                    embed.add_field(name="Slide Skill", value=line["slide_skill"]+ "\n",inline=False)
+                    embed.add_field(name="Drive Skill", value=line["drive_skill"]+ "\n", inline=False)
                     embed.set_footer(text=line["notes"], icon_url="https://i.imgur.com/zcJGvMI.png")
                     embed.set_thumbnail(url=line["thumbnail"])
                     embed.set_image(url=line["image"])
@@ -56,4 +57,4 @@ async def child_search(message):
     else:
         await message.delete()
         await message.author.send("I see that u tried to search a child outside of the `i-am-bot` channel, "
-                                                  "so i'll ignore you.")
+                                  "so i'll ignore you.")

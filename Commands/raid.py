@@ -13,9 +13,9 @@ async def raid(message):
 
         m = await message.channel.send("@here")
 
-        em = Embed(title="Raid alert!", color=Color.dark_red(), description="@here {} found a/an raid!".format(author),
+        em = Embed(title="Raid alert!", color=Color.dark_gold(), description="@here {} found a/an raid!".format(author),
                    timestamp=datetime.datetime.utcnow())
-        em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/448342259406995486/demeter.png")
+        em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418594680528437278/something_smaller.png")
 
         if parsed_list[0] == 'aria':
             em.color = Color.gold()
@@ -53,7 +53,6 @@ async def raid(message):
                 if item == 'slayers' or item == 'slayer':
                     em.set_image(
                         url="https://cdn.discordapp.com/attachments/167280538695106560/420925799491698688/slayersslime.png")
-
 
         elif parsed_list[0] == 'morgan':
             em.title = "I-It's not like i want to serve you"

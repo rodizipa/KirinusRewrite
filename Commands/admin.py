@@ -52,3 +52,18 @@ async def purge(message):
     else:
         message.author.send("You don't have permissions to do that.")
         await message.delete()
+
+
+async def estimated_inquisition(message):
+    if message.author.id == 114010253938524167:
+        heretics = await message.guild.estimate_pruned_members(days=30)
+        await message.channel.send("{} Heretics found during the brazilian inquisition.".format(heretics))
+    await asyncio.sleep (1)
+    await message.delete()
+
+
+async def inquisition(message):
+    if message.author.id == 114010253938524167:
+        heretics = await message.guild.prune_members(days=30, reason="Nobody Expects the brazilian inquisition.")
+        await message.channel.send("{} heretics eliminated by the brazilian inquisition.".format(heretics))
+    await message.delete()

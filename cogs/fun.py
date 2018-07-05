@@ -1,9 +1,9 @@
 import random
-import CONFIG
-from discord import Embed, Color
 import asyncio
+from discord.ext import commands
+from utils import formatter
+from discord import Embed
 
-# Gives a random answer
 coinFlip = [
     'https://cdn.discordapp.com/attachments/448341812055244817/448502226021908490/coinsmalltails.png',
     'https://cdn.discordapp.com/attachments/448341812055244817/448502223589212160/coinsmall.png'
@@ -91,6 +91,7 @@ five_stars = [
     "newbie_mona",
     "bathory",
     "syrinx",
+    "astrea",
 ]
 
 world_bosses = [
@@ -149,63 +150,57 @@ slaps = [
     'got a whip from chest. Time to try it, {} will be the target.'
 ]
 
-phrases = [
-    'I will not tag people by whim again.',
-    'I will donate all my money to Sorrowful.',
-    'Ameno.',
-]
+class FunCog:
+    def __init__(self,bot):
+        self.bot = bot
+
+    @commands.command(name='8ball')
+    async def eight_ball(self, ctx):
+        """Ask the great 8ball for answer."""
+
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
+            await ctx.send(random.choice(quotes))
+        else:
+            await ctx.message.delete()
+            await ctx.author.send("My mystical ball only works on channels with rich magic like`i-am-bot`")
+
+    @commands.command(name='choose', aliases=['choice', 'pick'])
+    async def choose(self, ctx, *, args):
+        """Choose one or another"""
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
+            split_message = args.split(',')
+            await ctx.send(random.choice(split_message))
+        else:
+            await ctx.message.delete()
+            await ctx.author.send("This command is locked to `i-am-bot`.")
+
+    @commands.command(name='coin', aliases=['flip'])
+    async def flip_coin(self,ctx):
+        """Flip a coin."""
+        em = await formatter.coin_embed(random.choice(coinFlip))
+        m = await ctx.send(embed=em)
+        await asyncio.sleep(8)
+        await ctx.message.delete()
+        await m.delete()
+
+    @commands.command(name='slap')
+    async def slap(self,ctx):
+        """Slap someone."""
+        em = Embed(description=ctx.author.display_name + " " + random.choice(slaps).format(ctx.message.mentions[0].display_name))
+        await ctx.send(embed=em)
+        await ctx.message.delete()
+
+    @commands.command(name='gacha', aliases=['gatcha'])
+    async def gacha(self,ctx, *args):
+        """Chooses a random 5* that can be get from gacha."""
+        if args:
+            if args[0] == 'wb':
+                em = Embed(description=ctx.author.display_name + " thinks that the world boss will be " + random.choice(world_bosses))
+        else:
+            em = Embed(description=ctx.author.display_name + " guessed " + random.choice(five_stars))
+        await ctx.send(embed=em)
+        await ctx.message.delete()
 
 
-async def eight_ball(message):
-    if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
-        await message.channel.send(random.choice(quotes))
-    else:
-        await message.author.send("My mystical ball only works on channels with rich magic, "
-                                  "like`i-am-bot`.")
-        await message.delete()
-
-
-async def choose(message):
-    if message.channel.id == 167280538695106560 or message.channel.id == 360916876986941442:
-        parsed_message = message.content.replace(CONFIG.PREFIX + "choose", "")[1:]
-        split_message = parsed_message.split(",")
-        await message.channel.send(random.choice(split_message))
-    else:
-        await message.author.send("This command is locked to `i-am-bot` channel right now.")
-        await message.delete()
-
-
-async def flip_coin(message):
-    em = Embed(color=Color.dark_blue())
-    em.set_image(url=random.choice(coinFlip))
-    m = await message.channel.send(embed=em)
-    await asyncio.sleep(6)
-    await message.delete()
-    await m.delete()
-
-
-async def slap(message):
-    em = Embed(color=Color.blue(), description="*" + message.author.display_name + " " + random.choice(slaps).format(
-        message.mentions[0].display_name) + "*")
-    await message.channel.send(embed=em)
-    await asyncio.sleep(1)
-    await message.delete()
-
-
-async def replace(message):
-    gatcha = random.randint(0, 100)
-    if gatcha <= 2:
-        await message.delete()
-        await asyncio.sleep(1)
-        await message.channel.send(random.choice(phrases))
-
-
-async def gatcha(message):
-    if "wb" in message.content.split():
-        em = Embed(color=Color.blue(),
-                   description=message.author.display_name + " Thinks that the world boss will be " + random.choice(world_bosses))
-    else:
-        em = Embed(color=Color.blue(), description=message.author.display_name + " guessed " + random.choice(five_stars))
-    await message.channel.send(embed=em)
-    await asyncio.sleep(1)
-    await message.delete()
+def setup(bot):
+    bot.add_cog(FunCog(bot))

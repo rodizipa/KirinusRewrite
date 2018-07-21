@@ -5,7 +5,7 @@ Destiny child stuff related bot based using discord.py rewrite API wrapper.
 Here is a overview of Kirinus Functions.
 
 ## New Features!
-    * 05/22 - Slap and coin function.
+     07/21- [BETA]Waifu game introduced, list units too.
 
 ## Commands
 
@@ -16,8 +16,6 @@ Learn more about Kirinus commands:
 * [Quotes](#quote-command)
     - [add/edit quote](#adding-quotes:)
     - [remove quote](#removing-a-quote:)
-* [Timer](#timer)
-* [Tierlist](#tierlist)
 * [Reset](#reset-countdown)
 * [Maint](#maint)
 * [8 Ball](#8-ball)
@@ -25,29 +23,19 @@ Learn more about Kirinus commands:
 * [coin](#coin:)
 * [Choose](#choose)
 * [Child Search](#child-search)
+* [list](#list)
+* [Waifu Game](#waifu-game-[beta])
 
-
-### Tierlist
-Returns the tierlist
-
-`?tierlist`
-
-### Timer 
-Returns the countdown till event. 
-
-`?timer MM/DD HH:mm`
-
-Not that the time need to be at kst.
-
-### Gatcha
+### Gatcha or Gacha
 
 Gives you a random 5* child name that can be obtained or world boss if the argument `wb`  is present.
 
 Usage: `?gatcha` or `?gatcha wb`
 
+Aliases: `Using ?gacha` works too.
+
 ### Reset Countdown
 Gives the countdown till the next reset.
-
 Use:
 `?reset`
 
@@ -91,7 +79,6 @@ will return:
 
 Currently the only names that don't have a pic associated are *zelos* and *rudolph*.
 
-**Important:** The raid name is the only argument that have a position fixed and must be the 2nd argument if you want to add other arguments.
 
 #### Adding mention [raid owner] field:
 
@@ -103,7 +90,7 @@ will tell me that the user Math found the raid:
 
 ![raid owner img](https://rodizipa.gitbooks.io/kirinus-docs/content/assets/Screenshot_2.png)
 
-**Obs:**The reason i don't keep the mention on the box is because currently on mobile discord, mentions don't appear on embed boxes, instead the user id is displayed. That means that instead of the mention, mobile users will only see numbers. So, using the display name works for now.
+**Obs:** The reason i don't keep the mention on the box is because currently on mobile discord, mentions don't appear on embed boxes, instead the user id is displayed. That means that instead of the mention, mobile users will only see numbers. So, using the display name works for now.
 
 #### Adding level field:
 
@@ -164,6 +151,9 @@ if you used:
 
 `?quote remove <tag>`
 
+#### Quote Information:
+`?quote info <tag>` Will display basic info about the quote creation.
+
 ### Slap:
 Kirinus will deliver your slap to someone else.
 
@@ -191,3 +181,33 @@ use: `?child name`. Ex: `?child mammon`
 
 Obs: Some childs accept alliases, spaced names must include the whitespace like `?child sang ah`. 
 If you can't find the child check [Kirinus Database KR.](https://docs.google.com/spreadsheets/d/1SaZ_QXHhqbRWHYSjY9_g5-TKom-ArxNrjhO_J8DJL7I/edit#gid=0)
+
+### List
+
+In case you want to list all childs in the db and their search terms, or search for a specific term, list can be useful.
+
+Use: 
+* `?list` displays all childs in db.
+* `?list mona` will search for childs that has mona somewhere on their name.
+
+### Waifu Game [Beta]
+
+Minigame where you finally can declare to the entire server that you're the only one that owns that child.
+
+* You get 5 rolls per 1h;
+* You can claim a child to yourself once each 3 hours. 
+
+use:
+* `?waifu`  or `?w`: Will consume a roll point. If child doesn't have a owner, an emoticon will appear, first one that clicks on it and has a claim gets the child. (consuming the claim).
+
+* `?waifulist [mention]` or `?wl [mention]`: Lists user claimed childs. If no mention is provided, list will load author list.
+
+* `?waifuclaim` or `?wc`: Informs the time required to next claim reset and if you have a claim available.
+
+* `?favoritewaifu <name>` or `?fw <name>`: Search the child that matches the name and add the thumbnail at your list.
+
+* `?waifuinfo <name>` or `?wi` : Search the unit in the waifu game db.
+
+* `waifutrade <mention>` or `?wt`: Trade your waifu with someone else.
+
+* `waifurelease <name>` or `?wr <name>`: Release your unit.

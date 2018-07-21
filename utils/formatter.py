@@ -1,4 +1,6 @@
 from discord import Colour, Embed
+import datetime
+import random
 
 
 async def element_color(element):
@@ -47,30 +49,17 @@ async def quote_info(ctx, row):
     em = Embed(title=row['invoke'], color=Colour.dark_blue())
 
     if row['text'].startswith("http") or row['text'].startswith(" http"):
-        em.set_image(url=row["text"])
+        em.set_thumbnail(url=row["text"])
     else:
         em.description = (row["text"])
 
     if row['user_id']:
 
-        try:
-            member = ctx.guild.get_member(row['user_id'])
-        except AttributeError:
-            member = ctx.bot.get_user(row['user_id'])
-        except:
-            pass
-
-        finally:
-            member = None
-
+        member = ctx.guild.get_member(row['user_id'])
+        
         if member:
             display = member.display_name
-
-            if member.avatar_url_as(static_format='png')[54:].startswith('a_'):
-                avi = member.avatar_url.rsplit("?", 1)[0]
-            else:
-                avi = member.avatar_url_as(static_format='png')
-            em.set_thumbnail(url=avi)
+            em.set_author(name='Tag info', icon_url=member.avatar_url)
         else:
             display = row['created_by']
 
@@ -81,7 +70,7 @@ async def quote_info(ctx, row):
 
     if row['created_at']:
         date = row['created_at']
-        em.add_field(name='Created at', value=f'{date:%A, %d. %B %Y : %H:%M:%S}', inline=True)
+        em.add_field(name='Created at', value=f'{date:%d. %B %Y : %H:%M:%S}', inline=True)
 
     return em
 
@@ -92,3 +81,25 @@ async def coin_embed(url):
 
     return em
 
+
+async def wb_ticket_reset():
+    em = Embed(title="Ticket Reset!", description=':alarm_clock: @here Ticket reset! :alarm_clock:', timestamp=datetime.datetime.utcnow())
+    return em
+
+
+gacha_phrases = [
+    'Ameno.',
+    "I'll not do this again.",
+    "Don't mind me, i'm a dunce.",
+    "Get cucked bro.",
+    "Not on my duty.",
+    "Oof",
+]
+
+
+async def kirinus_gacha(message):
+    if random.randrange(1, 100) < 5:
+        await message.delete()
+        await message.channel.send(random.choice(gacha_phrases))
+    else:
+        return None

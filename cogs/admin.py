@@ -10,7 +10,7 @@ class AdminCog:
 
     @commands.command(name='role')
     @commands.is_owner()
-    async def role(self, ctx, action,user: discord.Member, result_role: discord.Role):
+    async def role(self, ctx, action, user: discord.Member, result_role: discord.Role):
         """Assign/remove roles to user."""
         if action == 'add':
             await user.add_roles(result_role)
@@ -54,6 +54,30 @@ class AdminCog:
         """Repeats what was typed."""
         await ctx.send(text)
         await ctx.message.delete()
+
+    @commands.command(name='listreact')
+    @commands.is_owner()
+    async def listreact(self, ctx, channel: discord.TextChannel, target_id: int):
+        if target_id:
+            m = await channel.get_message(target_id)
+
+            if m:
+                react_list = []
+
+                for react in m.reactions:
+                    react_list.append(f"React: {str(react)}\n")
+                    async for user in react.users():
+                        react_list.append(f' {str(user)}\n')
+
+                with open('reactionlist.txt','w', encoding='utf8') as f:
+                    for line in react_list:
+                        f.write(line)
+
+        else:
+            m = await ctx.send("No message with such ID found. (Deleted, can bot see?, missing argument?)")
+            await asyncio.sleep(5)
+            await m.delete()
+            await ctx.message.delete()
 
 
 def setup(bot):

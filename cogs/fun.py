@@ -3,6 +3,7 @@ import asyncio
 from discord.ext import commands
 from utils import formatter
 from discord import Embed
+import discord
 
 coinFlip = [
     'https://cdn.discordapp.com/attachments/448341812055244817/448502226021908490/coinsmalltails.png',
@@ -136,7 +137,7 @@ slaps = [
     'gives {} a clout round the head with a fresh copy of WeeChat',
     'slaps {} with a large smelly trout',
     'breaks out the slapping rod and looks sternly at {}',
-    'slaps {}\'s bottom and grins cheekily',
+    "slaps {}'s bottom and grins cheekily",
     'slaps {} a few times',
     'slaps {} and starts getting carried away',
     'would slap {}, but (s)he is too lazy to do it.',
@@ -166,7 +167,7 @@ class FunCog:
 
     @commands.command(name='choose', aliases=['choice', 'pick'])
     async def choose(self, ctx, *, args):
-        """Choose one or another"""
+        """Choose one or another args:<option> , <option2> [, <option3>...]"""
         if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
             split_message = args.split(',')
             await ctx.send(random.choice(split_message))
@@ -184,15 +185,15 @@ class FunCog:
         await m.delete()
 
     @commands.command(name='slap')
-    async def slap(self,ctx):
-        """Slap someone."""
-        em = Embed(description=ctx.author.display_name + " " + random.choice(slaps).format(ctx.message.mentions[0].display_name))
+    async def slap(self, ctx, mention: discord.Member):
+        """Slap someone. args: <mention>"""
+        em = Embed(description=ctx.author.display_name + " " + random.choice(slaps).format(mention.display_name))
         await ctx.send(embed=em)
         await ctx.message.delete()
 
     @commands.command(name='gacha', aliases=['gatcha'])
-    async def gacha(self,ctx, *args):
-        """Chooses a random 5* that can be get from gacha."""
+    async def gacha(self, ctx, *args):
+        """Chooses a random 5* that can be get from gacha. args: [wb]"""
         if args:
             if args[0] == 'wb':
                 em = Embed(description=ctx.author.display_name + " thinks that the world boss will be " + random.choice(world_bosses))
@@ -200,6 +201,33 @@ class FunCog:
             em = Embed(description=ctx.author.display_name + " guessed " + random.choice(five_stars))
         await ctx.send(embed=em)
         await ctx.message.delete()
+
+    @commands.command(name='user', aliases=['userinfo', 'info', 'ui', 'uinfo'])
+    @commands.guild_only()
+    async def user_info(self,ctx, *args):
+        """returns mentioned user info. Aliases: userinfo, info, ui, uinfo"""
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
+            if args:
+                user = ctx.message.mentions[0]
+            else:
+                user = ctx.author
+
+            if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
+                avi = user.avatar_url.rsplit("?", 1)[0]
+            else:
+                avi = user.avatar_url_as(static_format='png')
+
+            em = Embed(timestamp=ctx.message.created_at)
+            em.add_field(name='Nick', value=user.display_name, inline=False)
+            em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
+            em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
+            em.set_thumbnail(url=avi)
+            em.set_footer(text=f'Invoked by: {ctx.author.display_name}')
+            await ctx.message.delete()
+            await ctx.send(embed=em)
+        else:
+            await ctx.message.delete()
+            await ctx.author.send("Don't use it outside of bot channel.")
 
 
 def setup(bot):

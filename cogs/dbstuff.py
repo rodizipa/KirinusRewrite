@@ -15,8 +15,8 @@ class DbCog:
     async def list(self, ctx, *args):
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
             if args:
-                query = "SELECT child_call, alias1, alias2, name FROM childs WHERE concat(child_call, alias1, alias2) similar to $1;"
-                query_name = ' '.join(args)
+                query = "SELECT child_call, alias1, alias2, name FROM childs WHERE concat(child_call, alias1, alias2, name) similar to $1;"
+                query_name = ' '.join(args).lower()
                 invoke_records = await self.bot.db.fetch(query, f"%{query_name}%")
                 if invoke_records:
                     # list results
@@ -58,7 +58,7 @@ class DbCog:
         """Search child info in database. Arguments: <child name>"""
 
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            query = "SELECT * FROM childs WHERE $1 in (child_call, alias1, alias2);"
+            query = "SELECT * FROM childs WHERE $1 in (child_call, alias1, alias2, LOWER(name));"
             row = await self.bot.db.fetchrow(query, child_call.lower())
 
             # Checks if we got result or if we need to list:
@@ -99,8 +99,7 @@ class DbCog:
 
             if row:
                 async with connection.transaction():
-                    update = "UPDATE quotes SET text = $1 created_at = $2, user_id = $3, created_by = $4 " \
-                             "WHERE invoke = $5;"
+                    update = "UPDATE quotes SET text = $1, created_at = $2, user_id = $3, created_by = $4 WHERE invoke = $5;"
                     await self.bot.db.execute(update, args[2], datetime.datetime.now(), ctx.author.id,
                                               ctx.author.display_name, args[1])
                 await self.bot.db.release(connection)
@@ -202,9 +201,7 @@ class DbCog:
                     maint_time = pendulum.parse(args[1], tz='Asia/Seoul', strict=False)
                     # convert pen to datatime for saving in db
 
-                    maint_time = datetime.datetime(maint_time.year, maint_time.month, maint_time.day, maint_time.hour,
-                                                   maint_time.minute, maint_time.second, maint_time.microsecond,
-                                                   maint_time.timezone)
+                    maint_time = formatter.pendulum_to_datetime(maint_time)
 
                     if row:
                         async with connection.transaction():
@@ -252,6 +249,7 @@ class DbCog:
                 await asyncio.sleep(5)
                 await ctx.message.delete()
                 await m.delete()
+
 
 def setup(bot):
     bot.add_cog(DbCog(bot))

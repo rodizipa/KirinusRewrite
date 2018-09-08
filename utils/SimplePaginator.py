@@ -160,7 +160,10 @@ class SimplePaginator:
                 if self.embed is True:
                     if self.author:
                         page = discord.Embed(title=f'Page {index + 1}/{len(chunks)}', color=self.colour)
-                        page.set_author(name=f"{self.author.display_name}'s harem", icon_url=self.author.avatar_url)
+                        if len(self.entries) == 2:
+                            page.set_author(name=f"{self.author.display_name}'s Lover", icon_url=self.author.avatar_url)
+                        else:
+                            page.set_author(name=f"{self.author.display_name}'s harem", icon_url=self.author.avatar_url)
                         if self.favorite:
                             page.set_thumbnail(url=self.favorite)
                     else:

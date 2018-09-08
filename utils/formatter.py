@@ -2,7 +2,6 @@ from discord import Colour, Embed
 import datetime
 import random
 
-
 async def element_color(element):
     switch = {
         'Light': Colour.gold(),
@@ -78,12 +77,12 @@ async def quote_info(ctx, row):
 async def coin_embed(url):
     em = Embed(colour=Colour.dark_blue())
     em.set_image(url=url)
-
     return em
 
 
 async def wb_ticket_reset():
     em = Embed(title="Ticket Reset!", description=':alarm_clock: @here Ticket reset! :alarm_clock:', timestamp=datetime.datetime.utcnow())
+    em.set_footer(text="Use ?wb stop if world boss is dead.")
     return em
 
 
@@ -92,8 +91,10 @@ gacha_phrases = [
     "I'll not do this again.",
     "Don't mind me, i'm a dunce.",
     "Get cucked bro.",
-    "Not on my duty.",
+    "Get shit on.",
     "Oof",
+    "Gotcha Bitch!",
+    "**CENSORED**",
 ]
 
 
@@ -103,3 +104,9 @@ async def kirinus_gacha(message):
         await message.channel.send(random.choice(gacha_phrases))
     else:
         return None
+
+
+def pendulum_to_datetime(pendulum):
+    dt_time = datetime.datetime(pendulum.year, pendulum.month, pendulum.day, pendulum.hour, pendulum.minute,
+                                pendulum.second, pendulum.microsecond, pendulum.timezone)
+    return dt_time

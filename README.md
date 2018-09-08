@@ -4,27 +4,41 @@ Destiny child stuff related bot based using discord.py rewrite API wrapper.
 
 Here is a overview of Kirinus Functions.
 
-## New Features!
-     07/21- [BETA]Waifu game introduced, list units too.
-
+## Changes:
+     09/08:
+        Added `?jailtime` (So you can check your time left in forced role)
+        Added `?deassign`
+        Added `?b`and `?s` aliases for balance and shop
+        Added repeat buy in kiri shop using the shortcut. `?shop <option> <number to repeat>
+        Removed /100 in affinity as it is irrelevant
+        Announcing raids can trigger jackpot
+        
 ## Commands
 
 Learn more about Kirinus commands:
 
-* [Raid](#raid-command)
-* [World Boss](#world-boss-command) (beta)
+Fun:
+* [8 Ball](#8-ball)
 * [Quotes](#quote-command)
     - [add/edit quote](#adding-quotes:)
     - [remove quote](#removing-a-quote:)
-* [Reset](#reset-countdown)
-* [Maint](#maint)
-* [8 Ball](#8-ball)
 * [Slap](#slap:)
 * [coin](#coin:)
 * [Choose](#choose)
+* [Waifu Game](#waifu-game-[beta])
+    
+DC:
+* [Raid](#raid-command)
+* [World Boss](#world-boss-command)
+* [Reset](#reset-countdown)
+* [Maint](#maint)
 * [Child Search](#child-search)
 * [list](#list)
-* [Waifu Game](#waifu-game-[beta])
+
+Role Management:
+    * [Assign](#assign)
+    * [Deassign](#deassign)
+    * [Jailtime](#jail-time)
 
 ### Gatcha or Gacha
 
@@ -211,3 +225,22 @@ use:
 * `waifutrade <mention>` or `?wt`: Trade your waifu with someone else.
 
 * `waifurelease <name>` or `?wr <name>`: Release your unit.
+
+* `shop [optional shop number] [optional repetition]` or `s` : Kirinus shop.
+
+* `balance` or `inventory` or `b`: Show your inventory.
+
+### Assign:
+Admin cmd. Assigns a role to mentioned user and removes it after the set time. If dunce role, plankton is removed.
+
+`?assign <member> <role> HH/MM`
+
+### Deassign:
+Admin cmd. Removes the assigment of the member. If dunce role, plankton is added.
+
+`?deassign <member>`
+    
+### Jail Time:
+CHeck time left in assigned role.
+
+`?jailtime [optional: user]`

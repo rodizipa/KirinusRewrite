@@ -3,6 +3,7 @@ from utils.formatter import element_color
 from discord import Embed
 import datetime
 import asyncio
+import random
 
 
 class DcCogs:
@@ -12,7 +13,7 @@ class DcCogs:
     @commands.command(name='raid')
     async def raid(self, ctx, *args):
         """Call raids announcement. args: [optional: Owner (mention)], [optional: level : number], [optional: name]"""
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 449061137523277834:
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 477146466607955971 or ctx.message.channel.id == 471539799975526400:
             m = await ctx.send("@here")
 
             # Set raid owner
@@ -24,7 +25,7 @@ class DcCogs:
             # default raid alert
             em = Embed(colour=await element_color('Light'), title="Raid Alert!", description=f"@here, {owner} found a raid!", timestamp=datetime.datetime.now())
             em.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
-            em.set_image(url="https://cdn.discordapp.com/attachments/242845451739463681/418594680528437278/something_smaller.png")
+            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773568660439060/iphisraid.png")
 
             level = None
             raid_call = None
@@ -151,7 +152,7 @@ class DcCogs:
                 elif raid_call in ('hildr', 'hilde'):
                     em.colour = await element_color('Light')
                     em.description = f'@here, {owner} found a {raid_call}!'
-                    em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438365216899085/hildr.png")
+                    em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773560922079233/hildrraid.png")
 
                 elif raid_call in 'neman':
                     em.colour = await element_color('Dark')
@@ -163,6 +164,16 @@ class DcCogs:
                     em.description = f'@here, {owner} found a {raid_call}!'
                     em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438410498736148/nicole.png")
 
+                elif raid_call == 'pomona':
+                    em.colour = await element_color('Forest')
+                    em.description = f'@here, {owner} found a {raid_call}!'
+                    em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773578773168129/pomonaraid.png")
+
+                elif raid_call == 'iphis':
+                    em.colour = await element_color('Light')
+                    em.description = f'@here, {owner} found a {raid_call}!'
+                    em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773568660439060/iphisraid.png")
+
                 else:
                     em.description = f'@here, {owner} found a/an {raid_call}'
 
@@ -173,6 +184,16 @@ class DcCogs:
             await m.delete()
             await ctx.send(embed=em)
             await ctx.message.delete()
+
+            if random.randrange(1, 100) < 3:
+                value = random.randint(1, 5)
+                updatecoins = "UPDATE w_players SET coins = coins + $1 WHERE owner_id = $2;"
+                connection = await self.bot.db.acquire()
+                async with connection.transaction():
+                    await self.bot.db.execute(updatecoins, value, ctx.author.id)
+                await self.bot.db.release(connection)
+                await ctx.send(
+                    f"<:kiri:431294173614964736> Jackpot! {ctx.author.mention} got {value} kiricoins <:kiri:431294173614964736>")
         else:
             await ctx.message.delete()
             await ctx.author.send("You can't do raid call outside of raid channel.")
@@ -206,6 +227,11 @@ class DcCogs:
                 elif args[1] == "aria":
                     em.set_image(
                         url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
+                    em.colour = await element_color('Light')
+
+                elif args[1] == "iphis":
+                    em.set_image(
+                        url="https://cdn.discordapp.com/attachments/448341812055244817/474773582472413205/iphiswb.png")
                     em.colour = await element_color('Light')
 
                 elif args[1] == "bari":

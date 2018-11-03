@@ -198,8 +198,13 @@ class DbCog:
                     query = "SELECT * FROM alarms WHERE $1 = alarm_name;"
                     row = await self.bot.db.fetchrow(query, 'maint')
                     connection = await self.bot.db.acquire()
-                    maint_time = pendulum.parse(args[1], tz='Asia/Seoul', strict=False)
+
                     # convert pen to datatime for saving in db
+
+                    if len(args) == 3:
+                        maint_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz='Asia/Seoul')
+                    else:
+                        maint_time = pendulum.parse(args[1], tz='Asia/Seoul', strict=False)
 
                     maint_time = formatter.pendulum_to_datetime(maint_time)
 

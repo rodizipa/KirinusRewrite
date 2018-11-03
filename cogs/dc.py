@@ -1,6 +1,6 @@
 from discord.ext import commands
 from utils.formatter import element_color
-from discord import Embed
+from discord import Embed, utils
 import datetime
 import asyncio
 import random
@@ -13,7 +13,8 @@ class DcCogs:
     @commands.command(name='raid')
     async def raid(self, ctx, *args):
         """Call raids announcement. args: [optional: Owner (mention)], [optional: level : number], [optional: name]"""
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 477146466607955971 or ctx.message.channel.id == 471539799975526400:
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 477146466607955971 or ctx.message.channel.id == 504862373459525643:
+
             m = await ctx.send("@here")
 
             # Set raid owner
@@ -23,9 +24,9 @@ class DcCogs:
                 owner = ctx.author.display_name
 
             # default raid alert
-            em = Embed(colour=await element_color('Light'), title="Raid Alert!", description=f"@here, {owner} found a raid!", timestamp=datetime.datetime.now())
+            em = Embed(colour=await element_color('Dark'), title="Raid Alert!", description=f"@here, {owner} found a raid!", timestamp=datetime.datetime.now())
             em.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
-            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773568660439060/iphisraid.png")
+            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png")
 
             level = None
             raid_call = None
@@ -43,6 +44,26 @@ class DcCogs:
                     em.colour = await element_color('Light')
                     em.description = f'@here, {owner} found an Aria!'
                     em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438159951986708/Aria.png")
+
+                elif raid_call == 'davi':
+                    em.colour = await element_color('Dark')
+                    em.description = f'@here, {owner} found a Davi!'
+                    em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png')
+
+                elif raid_call == 'navi':
+                    em.colour = await element_color('Fire')
+                    em.description = f'@here, {owner} found a Navi!'
+                    em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/504999710608850944/naviragna.png')
+
+                elif raid_call == 'cocoon':
+                    em.colour = await element_color('Dark')
+                    em.description = f'@here, {owner} found a Cocoon!'
+                    em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/504999704401281034/fusionmachineragna.png')
+
+                elif raid_call == 'doll':
+                    em.colour = await element_color('Dark')
+                    em.description = f'@here, {owner} found a Doll!'
+                    em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/504999696884957194/dollragna.png')
 
                 elif raid_call in ('cleo', 'cleopatra'):
                     em.colour = await element_color('Light')
@@ -200,102 +221,27 @@ class DcCogs:
 
     @commands.command(name="wb")
     async def wb_cmd(self, ctx, *args):
+        if args[0] == 'join':
+            try:
+                role = utils.get(ctx.author.roles, id=295083791884615680)
+                if role:
+                    wb_role = utils.get(ctx.guild.roles, id=494856310844686337)
+                    await ctx.author.add_roles(wb_role)
+                    m = await ctx.send("You have joined the WB squad.")
+                    await asyncio.sleep(5)
+                    await ctx.message.delete()
+                    await m.delete()
+            except Exception:
+                await asyncio.sleep(1)
+                await ctx.message.delete()
 
-        if args[0] == 'start':
-            m = await ctx.bot.wb.channel.send("@here world boss started!")
+        elif args[0] == 'leave':
+            wb_role = utils.get(ctx.guild.roles, id=494856310844686337)
+            await ctx.author.remove_roles(wb_role)
+            m = await ctx.send("You left the WB squad.")
+            await asyncio.sleep(5)
+            await ctx.message.delete()
             await m.delete()
-
-            em = Embed(title="World Boss Alert!", color= await element_color('Fire'), description="@here World Boss Started!",
-                       timestamp=datetime.datetime.utcnow())
-
-            if len(args) > 1:
-                if args[1] == "apep":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441750398269784064/WB_apep.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "aria":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "cleo" or args[1] == "cleopatra":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/448341812055244817/450101714062671872/cleowb.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "aria":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441750409812508702/WB_aria.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "iphis":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/448341812055244817/474773582472413205/iphiswb.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "bari":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796893765533711/WB_bari.png")
-                    em.colour = await element_color('Water')
-
-                elif args[1] == "khepri":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796938992451584/WB_Khepri.png")
-                    em.colour = await element_color('Dark')
-
-                elif args[1] == "krampus":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796939772723212/WB_Krampus.png")
-                    em.colour = await element_color('Forest')
-
-                elif args[1] == "morgan":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796946265636864/WB_morgan.png")
-
-                elif args[1] == "demeter":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/448341812055244817/450101683729596417/demeterwb.png")
-
-                elif args[1] == "nicole":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796946282414090/WB_nicole.png")
-                    em.colour = await element_color('Forest')
-
-                elif args[1] == "slime":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796942532706304/WB_Slime.png")
-                    em.colour = await element_color('Light')
-
-                elif args[1] == "rita":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796950090579988/WB_Rita.png")
-                    em.colour = await element_color('Dark')
-
-                elif args[1] == "isolde" or args[1] == "iseult" or args[1] == "spiku":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796948639612928/WB_Spiku.png")
-                    em.colour = await element_color('Water')
-
-                elif args[1] == "thetis":
-                    em.set_image(
-                        url="https://cdn.discordapp.com/attachments/167280538695106560/441796950241574912/WB_thetis.png")
-                    em.colour = await element_color('Water')
-
-            await ctx.bot.wb.channel.send(embed=em)
-            ctx.bot.wb.first_run_switch(True)
-            ctx.bot.wb.status_switch(True)
-
-        elif args[0] == 'stop':
-            m = await ctx.bot.wb.channel.send("@here World Boss died!")
-            await m.delete()
-            em=Embed(description="@here World Boss is dead.", timestamp=datetime.datetime.utcnow())
-            em.set_image(url="https://cdn.discordapp.com/emojis/287233221169512449.png?v=1")
-            await ctx.bot.wb.channel.send(embed=em)
-            ctx.bot.wb.status_switch(False)
-
-        await asyncio.sleep(1)
-        await ctx.message.delete()
 
 
 def setup(bot):

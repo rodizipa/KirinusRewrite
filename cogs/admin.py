@@ -47,6 +47,7 @@ class AdminCog:
             await ctx.send(f'{heretics} heretics found during the brazilian inquisition.')
         elif action =='burn':
             heretics = await ctx.message.guild.prune_members(days=30, reason="Nobody expects the brazilian inquisition.")
+            await ctx.send(f"{heretics} burned during the brazilian inquisition.")
 
         await ctx.message.delete()
 
@@ -151,8 +152,13 @@ class AdminCog:
 
             # Remove plankton if role is dunce
             if role.id == 311943704237572097:
-                plankton = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                await member.remove_roles(plankton)
+                kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
+                await member.remove_roles(kr_role)
+
+            if role.id == 506160697323814927:  # NA role
+                kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
+                await member.remove_roles(kr_role)
+
 
             await ctx.message.add_reaction('✅')
             await asyncio.sleep(5)
@@ -166,25 +172,32 @@ class AdminCog:
         if ctx.author.id in (224522663626801152, 114010253938524167):
             if member is None:
                 ctx.send("Invalid Member.")
+                return True
 
             row = await self.bot.db.fetchrow("select * from assign_roles where user_id = $1", member.id)
 
-            connection = await self.bot.db.acquire()
-            async with connection.transaction():
-                insert = "DELETE FROM assign_roles WHERE user_id = $1;"
-                await self.bot.db.execute(insert, member.id)
-            await self.bot.db.release(connection)
+            if row:
+                role_id = int(row['role_id'])
+                role = discord.utils.get(ctx.guild.roles, id=role_id)
+                await member.remove_roles(role)
 
-            role = discord.utils.get(ctx.guild.roles, id=row['role_id'])
-            await member.remove_roles(row)
+                connection = await self.bot.db.acquire()
+                async with connection.transaction():
+                    insert = "DELETE FROM assign_roles WHERE user_id = $1;"
+                    await self.bot.db.execute(insert, member.id)
+                await self.bot.db.release(connection)
 
-            if row['role_id'] == 311943704237572097:
-                plankton = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                await member.add_roles(plankton)
+                if role.id == 311943704237572097:  # dunce
+                    plankton = discord.utils.get(ctx.guild.roles, id=295083791884615680)
+                    await member.add_roles(plankton)
 
+                if role.id == 506160697323814927:  # NA
+                    kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
+                    await member.add_roles(kr_role)
 
-
-
+                await ctx.message.add_reaction('✅')
+                await asyncio.sleep(5)
+                await ctx.message.delete()
 
     @commands.command(name="jailtime")
     async def jailtime(self, ctx):
@@ -197,9 +210,31 @@ class AdminCog:
 
         if row:
             jail_time = pendulum.instance(row['time'])
-            await ctx.send(embed=discord.Embed(description=f"Time left: {jail_time.diff().as_interval()}"))
+            m = await ctx.send(embed=discord.Embed(description=f"Time left: {jail_time.diff().as_interval()}"))
         else:
-            await ctx.send("User not found.")
+            m = await ctx.send("User not found.")
+        await asyncio.sleep(10)
+        await ctx.message.delete()
+        await m.delete()
+
+    @commands.command(name="chslow")
+    async def chslow(self, ctx, channel: discord.TextChannel, time: int):
+        await channel.edit(reason="Sorrow wanted.", slowmode_delay=time)
+        m = await ctx.send(f"Channel {channel.name} slow mode edited to {time} seconds")
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+        await m.delete()
+
+    # add role
+
+    @commands.command(name="addrole")
+    async def addrole(self,ctx, rolename: str):
+        await ctx.guild.create_role(name=rolename)
+
+    # edit role color
+    @commands.command(name="rolecolor")
+    async def rolecolor(self, ctx, role: discord.Role, r, g ,b):
+        await role.edit(colour=discord.Colour.from_rgb(r=r, g=g, b=b))
 
 
 def setup(bot):

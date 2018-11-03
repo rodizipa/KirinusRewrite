@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import asyncio
 import asyncpg
-import datetime
 from time import gmtime, strftime
 from utils import formatter
 import CONFIG
@@ -13,28 +12,7 @@ class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(command_prefix=CONFIG.PREFIX, description="Destiny Child KR bot.")
         self.db = kwargs.pop("db")
-        self.wb_task = self.loop.create_task(self.world_boss_task())
-        self.wb = self.WorldBoss()
         self.rt = self.loop.create_task(self.reset_task())
-
-    class WorldBoss:
-        def __init__(self, channel=None, status=False, first_run=False):
-            self.channel = channel
-            self.status = status
-            self.first_run = first_run
-            self.reset_time = 7200  # World Boss Reset
-
-        def status_switch(self, value):
-            if value:
-                self.status = True
-            else:
-                self.status = False
-
-        def first_run_switch(self, value):
-            if value:
-                self.first_run = True
-            else:
-                self.first_run = False
 
     async def reset_task(self):
         await self.wait_until_ready()
@@ -43,7 +21,7 @@ class Bot(commands.Bot):
         decay_affinity = None
 
         while not self.is_closed():
-            query = "select * from alarms where alarm_name = 'rolls_reset' or alarm_name = 'claim_reset' or alarm_name = 'decay_affinity'"
+            query = "select * from alarms"
             rows = await self.db.fetch(query)
 
             for item in rows:
@@ -62,7 +40,7 @@ class Bot(commands.Bot):
 
                 connection = await self.db.acquire()
                 async with connection.transaction():
-                    update = "UPDATE public.alarms SET alarm_time=$1  WHERE alarm_name=$2;"
+                    update = "UPDATE alarms SET alarm_time=$1  WHERE alarm_name=$2;"
                     await self.db.execute(update, claim_reset, 'claim_reset')
                     update = "UPDATE w_players SET claim = 1 WHERE claim < 1"
                     await self.db.execute(update)
@@ -93,23 +71,34 @@ class Bot(commands.Bot):
                 await self.db.release(connection)
 
             # Process role time assignment
-            role_time = await self.db.fetch("select * from assign_roles;")
+            role_time = await self.db.fetch("select * from assign_roles")
 
             if role_time:
                 for item in role_time:
                     server = self.get_guild(int(item['guild_id']))
-                    member = server.get_member(item['user_id'])
 
-                    if pendulum.instance(item['time']) < now:
+                    if server:
+                        member = server.get_member(item['user_id'])
+                    else:
+                        member = None
+
+                    check_time = pendulum.instance(item['time'])
+
+                    if (now > check_time):
+
                         # remove role (assign plankton if dunce)
                         if member:
                             role = discord.utils.get(server.roles, id=item['role_id'])
                             await member.remove_roles(role)
-                            if item['role_id'] == 311943704237572097:
-                                pass
-                                # Assign plankton role
-                                plankton = discord.utils.get(server.roles, id=295083791884615680)
-                                await member.add_roles(plankton)
+
+                            if item['role_id'] == 311943704237572097:  # dunce
+                                # Assign kr role
+                                kr_role = discord.utils.get(server.roles, id=295083791884615680)
+                                await member.add_roles(kr_role)
+
+                            if item['role_id'] == 506160697323814927:  # NA
+                                kr_role = discord.utils.get(server.roles, id=295083791884615680)
+                                await member.add_roles(kr_role)
 
                         # remove row
                         connection = await self.db.acquire()
@@ -128,21 +117,6 @@ class Bot(commands.Bot):
                                 await member.add_roles(role)
 
             await asyncio.sleep(60)
-
-    async def world_boss_task(self):
-        await self.wait_until_ready()
-        self.wb.channel = self.get_channel(477146466607955971)  # Destiny Child Server
-        # self.wb.channel = self.get_channel(167280538695106560)  #debug
-        while not self.is_closed():
-            while self.wb.status:
-                if self.wb.first_run:
-                    self.wb.first_run_switch(False)
-                else:
-                    m = await self.wb.channel.send("@here Ticket reset!")
-                    await m.delete()
-                    await self.wb.channel.send(embed=await formatter.wb_ticket_reset())
-                await asyncio.sleep(self.wb.reset_time)
-            await asyncio.sleep(1)
 
     async def on_ready(self):
         print(f'{self.user.name} online!')

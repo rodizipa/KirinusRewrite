@@ -5,6 +5,8 @@ from utils import formatter
 from discord import Embed
 import discord
 
+
+
 coinFlip = [
     'https://cdn.discordapp.com/attachments/448341812055244817/448502226021908490/coinsmalltails.png',
     'https://cdn.discordapp.com/attachments/448341812055244817/448502223589212160/coinsmall.png'
@@ -93,6 +95,12 @@ five_stars = [
     "bathory",
     "syrinx",
     "astrea",
+    "myra",
+    "diver mona",
+    "summer lisa",
+    "summer davi",
+    "iphis",
+    "pomona"
 ]
 
 world_bosses = [
@@ -109,6 +117,7 @@ world_bosses = [
     'Morgan',
     'Krampus',
     'Bari',
+    'Iphis'
 ]
 
 quotes = [
@@ -204,7 +213,7 @@ class FunCog:
 
     @commands.command(name='user', aliases=['userinfo', 'info', 'ui', 'uinfo'])
     @commands.guild_only()
-    async def user_info(self,ctx, *args):
+    async def user_info(self, ctx, *args):
         """returns mentioned user info. Aliases: userinfo, info, ui, uinfo"""
         if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
             if args:

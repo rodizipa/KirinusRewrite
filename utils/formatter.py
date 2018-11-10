@@ -95,11 +95,18 @@ gacha_phrases = [
     "Oof",
     "Gotcha Bitch!",
     "**CENSORED**",
+    "Mission failed, we'll get em  next time.",
+    "I won't do this again.",
+    "I deserved this.",
+    "No one liked you anyways",
+    "The bs level in this message was higher than the allowed quota",
+    "It was gibberish anyways ¯\_(ツ)_/¯",
+    "Would be a shame if I ate your message",
 ]
 
 
 async def kirinus_gacha(message):
-    if random.randrange(1, 100) < 5:
+    if random.randrange(1, 100) < 4:
         await message.delete()
         await message.channel.send(random.choice(gacha_phrases))
     else:

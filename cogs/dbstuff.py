@@ -14,20 +14,53 @@ class DbCog:
     @commands.command(name='list')
     async def list(self, ctx, *args):
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
+            query_set={
+                "query": '',
+                "element": None,
+                "rank": None,
+                "role": None,
+            }
+
             if args:
-                query = "SELECT child_call, alias1, alias2, name FROM childs WHERE concat(child_call, alias1, alias2, name) similar to $1;"
-                query_name = ' '.join(args).lower()
-                invoke_records = await self.bot.db.fetch(query, f"%{query_name}%")
+                for arg in args:
+                    if arg.lower() in ("water", "fire", "forest", "dark", "light"):
+                        query_set['element'] = arg.lower()
+                    elif arg.lower() in ("attacker", "debuffer", "tank", "healer", "support"):
+                        query_set['role'] = arg.lower()
+                    elif arg.lower() in ("5", "4", "3"):
+                        query_set['rank'] = ':star:' * int(arg)
+                    else:
+                        if query_set['query'] == '':
+                            query_set['query'] = arg.lower()
+                        else:
+                            query_set['query'] = query_set['query'] + f' {arg}'.lower()
+
+                if query_set['query'] != '':
+                    query = "SELECT * FROM childs WHERE concat(child_call, alias1, alias2, name) similar to $1;"
+                    invoke_records = await self.bot.db.fetch(query, f"%{query_set['query']}%")
+                else:
+                    query = f"SELECT * FROM childs;"
+                    invoke_records = await self.bot.db.fetch(query)
+
+                if query_set['element']:
+                    invoke_records = [tup for tup in invoke_records if (tup['element'].lower() == query_set['element'])]
+
+                if query_set['role']:
+                    invoke_records = [tup for tup in invoke_records if (tup['role'].lower() == query_set['role'])]
+
+                if query_set['rank']:
+                    invoke_records = [tup for tup in invoke_records if (tup['rank'] == query_set['rank'])]
+
                 if invoke_records:
                     # list results
-                    result_list = [f"{'Name':<20}Search Term", ""]
+                    result_list = [f"{'Name':<30}Search Term", ""]
                     for item in invoke_records:
                         terms = item['child_call']
                         if item['alias1']:
                             terms = f"{terms}, {item['alias1']}"
                         if item['alias2']:
                             terms = f"{terms}, {item['alias2']}"
-                        result_list.append(f" {item['name']:<20}{terms}")
+                        result_list.append(f" {item['name']:<30}{terms}")
                     await SimplePaginator.SimplePaginator(entries=result_list, title='Results found.',
                                                           length=20, embed=False).paginate(ctx)
 

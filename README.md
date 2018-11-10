@@ -3,15 +3,6 @@
 Destiny child stuff related bot based using discord.py rewrite API wrapper.
 
 Here is a overview of Kirinus Functions.
-
-## Changes:
-     09/08:
-        Added `?jailtime` (So you can check your time left in forced role)
-        Added `?deassign`
-        Added `?b`and `?s` aliases for balance and shop
-        Added repeat buy in kiri shop using the shortcut. `?shop <option> <number to repeat>
-        Removed /100 in affinity as it is irrelevant
-        Announcing raids can trigger jackpot
         
 ## Commands
 
@@ -33,12 +24,16 @@ DC:
 * [Reset](#reset-countdown)
 * [Maint](#maint)
 * [Child Search](#child-search)
-* [list](#list)
+* [List](#list)
 
 Role Management:
-    * [Assign](#assign)
-    * [Deassign](#deassign)
-    * [Jailtime](#jail-time)
+* [Assign](#assign)
+* [Deassign](#deassign)
+* [Jailtime](#jail-time)
+
+And also if you're interested: [Changelog](#changes) (Not updated in every change.)
+
+
 
 ### Gatcha or Gacha
 
@@ -201,8 +196,13 @@ If you can't find the child check [Kirinus Database KR.](https://docs.google.com
 In case you want to list all childs in the db and their search terms, or search for a specific term, list can be useful.
 
 Use: 
+`?list [optional:unit name] [optional: element] [optional: role] [optional:rank(from 5 to 3)]`
+
 * `?list` displays all childs in db.
 * `?list mona` will search for childs that has mona somewhere on their name.
+* `?list 3` will list all 3*
+* `?list tank` will list all tanks.
+* `list light 4 mona healer` will list all units that are light type, with healer role, 4* rank and mona in name. (But if u did this u know who u're searching)
 
 ### Waifu Game [Beta]
 
@@ -244,3 +244,15 @@ Admin cmd. Removes the assigment of the member. If dunce role, plankton is added
 CHeck time left in assigned role.
 
 `?jailtime [optional: user]`
+
+## Changes:
+    11/10:
+        Enhanced list search.
+    
+     09/08:
+        Added `?jailtime` (So you can check your time left in forced role)
+        Added `?deassign`
+        Added `?b`and `?s` aliases for balance and shop
+        Added repeat buy in kiri shop using the shortcut. `?shop <option> <number to repeat>
+        Removed /100 in affinity as it is irrelevant
+        Announcing raids can trigger jackpot

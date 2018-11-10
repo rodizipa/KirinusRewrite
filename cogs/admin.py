@@ -217,6 +217,7 @@ class AdminCog:
         await ctx.message.delete()
         await m.delete()
 
+    @commands.is_owner()
     @commands.command(name="chslow")
     async def chslow(self, ctx, channel: discord.TextChannel, time: int):
         await channel.edit(reason="Sorrow wanted.", slowmode_delay=time)
@@ -226,14 +227,15 @@ class AdminCog:
         await m.delete()
 
     # add role
-
+    @commands.is_owner()
     @commands.command(name="addrole")
     async def addrole(self,ctx, rolename: str):
         await ctx.guild.create_role(name=rolename)
 
     # edit role color
+    @commands.is_owner()
     @commands.command(name="rolecolor")
-    async def rolecolor(self, ctx, role: discord.Role, r, g ,b):
+    async def rolecolor(self, ctx, role: discord.Role, r: int, g: int ,b: int):
         await role.edit(colour=discord.Colour.from_rgb(r=r, g=g, b=b))
 
 

@@ -223,20 +223,18 @@ class DcCogs:
     async def wb_cmd(self, ctx, *args):
         if args[0] == 'join':
             try:
-                role = utils.get(ctx.author.roles, id=295083791884615680)
-                if role:
-                    wb_role = utils.get(ctx.guild.roles, id=494856310844686337)
-                    await ctx.author.add_roles(wb_role)
-                    m = await ctx.send("You have joined the WB squad.")
-                    await asyncio.sleep(5)
-                    await ctx.message.delete()
-                    await m.delete()
+                wb_role = utils.get(ctx.guild.roles, id=512780401073455117)
+                await ctx.author.add_roles(wb_role)
+                m = await ctx.send("You have joined the WB squad.")
+                await asyncio.sleep(5)
+                await ctx.message.delete()
+                await m.delete()
             except Exception:
                 await asyncio.sleep(1)
                 await ctx.message.delete()
 
         elif args[0] == 'leave':
-            wb_role = utils.get(ctx.guild.roles, id=494856310844686337)
+            wb_role = utils.get(ctx.guild.roles, id=512780401073455117)
             await ctx.author.remove_roles(wb_role)
             m = await ctx.send("You left the WB squad.")
             await asyncio.sleep(5)

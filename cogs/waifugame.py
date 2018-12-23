@@ -551,9 +551,9 @@ class WaifuCog:
             connection = await self.bot.db.acquire()
             async with connection.transaction():
                 await self.bot.db.execute(update, now_dt, ctx.author.id)
-                await self.bot.db.execute(updatecoins, 10, ctx.author.id)
+                await self.bot.db.execute(updatecoins, 20, ctx.author.id)
             await self.bot.db.release(connection)
-            await ctx.send(embed=discord.Embed(description=":atm: You received 10 <:kirinuscoin:471161189574115338>. Don't spend it all on candy."))
+            await ctx.send(embed=discord.Embed(description=":atm: You received 20 <:kirinuscoin:471161189574115338>. Don't spend it all on candy."))
 
         elif now > next_reset:
             update = "update w_players set daily_claim = $1 where owner_id = $2"

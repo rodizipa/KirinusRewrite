@@ -61,11 +61,11 @@ class DbCog:
                         if item['alias2']:
                             terms = f"{terms}, {item['alias2']}"
                         result_list.append(f" {item['name']:<30}{terms}")
-                    await SimplePaginator.SimplePaginator(entries=result_list, title='Results found.',
+                    await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                                           length=20, embed=False).paginate(ctx)
 
                 else:
-                    await ctx.send('No results.')
+                    await ctx.send('No results. Need help? <https://rodizipa.github.io/KirinusRewrite/#list>')
             else:
                 # List all childs
                 query = "SELECT child_call, alias1, alias2, name FROM childs"
@@ -79,7 +79,7 @@ class DbCog:
                         search = search + f",{item['alias2']}"
 
                     result_list.append(f" {item['name']:<26}{search}")
-                await SimplePaginator.SimplePaginator(entries=result_list, title='Results found.',
+                await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                                       length=20, embed=False).paginate(ctx)
 
         else:
@@ -99,7 +99,7 @@ class DbCog:
                 em = await formatter.child_embed(row)
                 await ctx.send(embed=em)
             else:
-                em = Embed(description=f"Child not found. Try using ?list {child_call}")
+                em = Embed(description=f"Child not found. Try using ?list cmd.")
                 em.set_image(url="https://i.imgur.com/cf1TReg.jpg")
                 await ctx.send(embed=em)
         else:

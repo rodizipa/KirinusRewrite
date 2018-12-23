@@ -5,8 +5,21 @@ from utils import formatter
 import pendulum
 
 
+def is_admin():
+    async def predicate(ctx):
+        if ctx.author.id == ctx.bot.owner_id or ctx.author.id == 224522663626801152:
+            return True
+        else:
+            await ctx.author.send("You have no permissions.")
+            await asyncio.sleep(1)
+            await ctx.message.delete()
+
+    return commands.check(predicate)
+
+
 class AdminCog:
     """Owner and Admin Stuff"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,34 +39,48 @@ class AdminCog:
 
     @commands.command(name='nick')
     @commands.is_owner()
-    async def change_nick(self,ctx, user: discord.Member, nick):
+    async def change_nick(self, ctx, user: discord.Member, nick):
         """Change target nickname"""
         await user.edit(nick=nick)
         await ctx.message.delete()
 
+    @is_admin()
     @commands.command(name='purge', aliases=['prune'])
-    @commands.is_owner()
-    async def purge(self,ctx, number: int):
-        """Purge chat by x."""
+    async def purge(self, ctx, *args):
+        """Purge messages. if there is a number, the the last x messages will be deleted, if has user mention,
+            the bot will delete that person messages."""
+
+        if ctx.message.mentions:
+            mention = ctx.message.mentions[0]
+        else:
+            mention = None
+
+        number = int(args[0])
+
         await ctx.message.delete()
-        await ctx.message.channel.purge(limit=number)
+
+        if mention:
+            await ctx.message.channel.purge(limit=number, check=lambda m: m.author.id == mention.id)
+        else:
+            await ctx.message.channel.purge(limit=number)
 
     @commands.command(name="inquisition")
     @commands.is_owner()
-    async def inquisition(self,ctx,action):
+    async def inquisition(self, ctx, action):
         """Find/burn usernames without role afk for 30 days or more."""
         if action == 'find':
             heretics = await ctx.message.guild.estimate_pruned_members(days=30)
             await ctx.send(f'{heretics} heretics found during the brazilian inquisition.')
-        elif action =='burn':
-            heretics = await ctx.message.guild.prune_members(days=30, reason="Nobody expects the brazilian inquisition.")
+        elif action == 'burn':
+            heretics = await ctx.message.guild.prune_members(days=30,
+                                                             reason="Nobody expects the brazilian inquisition.")
             await ctx.send(f"{heretics} burned during the brazilian inquisition.")
 
         await ctx.message.delete()
 
     @commands.command(name='say')
     @commands.is_owner()
-    async def say(self, ctx, *, text:str):
+    async def say(self, ctx, *, text: str):
         """Repeats what was typed."""
         await ctx.send(text)
         await ctx.message.delete()
@@ -72,7 +99,7 @@ class AdminCog:
                     async for user in react.users():
                         react_list.append(f' {str(user)}\n')
 
-                with open('reactionlist.txt','w', encoding='utf8') as f:
+                with open('reactionlist.txt', 'w', encoding='utf8') as f:
                     for line in react_list:
                         f.write(line)
 
@@ -84,31 +111,32 @@ class AdminCog:
 
     @commands.command(name="help")
     async def myhelp(self, ctx):
-        await ctx.author.send("Check complete command list in: https://rodizipa.github.io/KirinusRewrite/\n All cmds uses the prefix `?`")
-        em = discord.Embed(title='Waifu Game:', description="Minigame where you can declare to the entire server that you"
-                                                            "own the child.\n You get 5 rolls per hour and a claim each 6h.\n\n"
-                                                            ":red_circle:`?waifu` or `?wf`: Will consume a roll point. A random child will be displayed, if "
-                                                            "it doesn't have a owner, a reaction will appear, if you click on it and"
-                                                            "have a claim point, you will become the unit owner. Note that kirinus will only"
-                                                            "wait 45 seconds for your answer.\n\n:large_blue_circle:`waifulist` or `wl`: "
-                                                            "List all units owned by you. If mention is included, it will list that person units instead.\n\n"
-                                                            ":red_circle:`waifuclaim` or `wc`: Informs if you have a claim point, and the time to next.\n\n"
-                                                            ":large_blue_circle:`favoritewaifu [name]` or `fw [name]`: Search and set child thumbnail as avatar in your list.\n\n"
-                                                            ":red_circle:`waifuinfo [name]` or `wi [name]`: search the unit in the game database.\n\n"
-                                                            ":large_blue_circle:`waifutrade [mention]` or `wt [mention]`: Starts a trade with mentioned user.\n\n"
-                                                            ":red_circle:`waifurelease [name]` or `wr [mention]`: Divorces with the unit.\n"
-                                                            ":large_blue_circle:`waifustatistics` or `ws` : Show owned/total units.\n"
-                                                            ":red_circle:`balance`: Show your Skewers/kiricoins balance\n"
-                                                            ":large_blue_circle:`shop`: Show Kirinus' Tent.\n"
-                                                            ":red_circle:`feed <child`: Feed your child for affinity.\n")
+        await ctx.author.send(
+            "Check complete command list in: https://rodizipa.github.io/KirinusRewrite/\n All cmds uses the prefix `?`")
+        em = discord.Embed(title='Waifu Game:',
+                           description="Minigame where you can declare to the entire server that you"
+                                       "own the child.\n You get 5 rolls per hour and a claim each 6h.\n\n"
+                                       ":red_circle:`?waifu` or `?wf`: Will consume a roll point. A random child will be displayed, if "
+                                       "it doesn't have a owner, a reaction will appear, if you click on it and"
+                                       "have a claim point, you will become the unit owner. Note that kirinus will only"
+                                       "wait 45 seconds for your answer.\n\n:large_blue_circle:`waifulist` or `wl`: "
+                                       "List all units owned by you. If mention is included, it will list that person units instead.\n\n"
+                                       ":red_circle:`waifuclaim` or `wc`: Informs if you have a claim point, and the time to next.\n\n"
+                                       ":large_blue_circle:`favoritewaifu [name]` or `fw [name]`: Search and set child thumbnail as avatar in your list.\n\n"
+                                       ":red_circle:`waifuinfo [name]` or `wi [name]`: search the unit in the game database.\n\n"
+                                       ":large_blue_circle:`waifutrade [mention]` or `wt [mention]`: Starts a trade with mentioned user.\n\n"
+                                       ":red_circle:`waifurelease [name]` or `wr [mention]`: Divorces with the unit.\n"
+                                       ":large_blue_circle:`waifustatistics` or `ws` : Show owned/total units.\n"
+                                       ":red_circle:`balance`: Show your Skewers/kiricoins balance\n"
+                                       ":large_blue_circle:`shop`: Show Kirinus' Tent.\n"
+                                       ":red_circle:`feed <child`: Feed your child for affinity.\n")
         await ctx.author.send(embed=em)
         await asyncio.sleep(1)
         await ctx.message.delete()
 
-
     @commands.is_owner()
     @commands.command(name='reload')
-    async def cog_reload(self, ctx, *, cog:str):
+    async def cog_reload(self, ctx, *, cog: str):
         """Command to reload cog, admin only. Use path form"""
 
         try:
@@ -117,7 +145,10 @@ class AdminCog:
         except Exception as e:
             await ctx.send(f"**ERROR**: {type(e).__name__} - {e}")
         else:
-            await ctx.send("Cog reloaded.")
+            m = await ctx.send("Cog reloaded.")
+            await asyncio.sleep(5)
+            await m.delete()
+            await ctx.message.delete()
 
     @commands.command(name='assign')
     async def assign(self, ctx, member: discord.Member, role: discord.Role, timestr):
@@ -142,7 +173,7 @@ class AdminCog:
 
             time = formatter.pendulum_to_datetime(time)
             connection = await self.bot.db.acquire()
-            
+
             async with connection.transaction():
                 insert = "INSERT INTO assign_roles (user_id, role_id, guild_id, time) VALUES ($1, $2, $3, $4);"
                 await self.bot.db.execute(insert, member.id, role.id, ctx.message.guild.id, time)
@@ -158,7 +189,6 @@ class AdminCog:
             if role.id == 506160697323814927:  # NA role
                 kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
                 await member.remove_roles(kr_role)
-
 
             await ctx.message.add_reaction('✅')
             await asyncio.sleep(5)
@@ -229,14 +259,49 @@ class AdminCog:
     # add role
     @commands.is_owner()
     @commands.command(name="addrole")
-    async def addrole(self,ctx, rolename: str):
+    async def addrole(self, ctx, rolename: str):
         await ctx.guild.create_role(name=rolename)
 
     # edit role color
     @commands.is_owner()
     @commands.command(name="rolecolor")
-    async def rolecolor(self, ctx, role: discord.Role, r: int, g: int ,b: int):
+    async def rolecolor(self, ctx, role: discord.Role, r: int, g: int, b: int):
         await role.edit(colour=discord.Colour.from_rgb(r=r, g=g, b=b))
+
+    @commands.is_owner()
+    @commands.command(name='trashping')
+    async def trashping(self, ctx, user: discord.Member, num: int):
+        for i in range(num):
+            await ctx.send(f"{user.mention}")
+            await asyncio.sleep(0)
+
+    @is_admin()
+    @commands.command(name='selfdestruct', aliases=['sd'], pass_context=True)
+    async def selfdestruct(self, ctx, amount):
+        """Explodes the last message after a time"""
+
+        async for message in ctx.message.channel.history():
+            if message.id == ctx.message.id:
+                continue
+            if message.author == ctx.message.author:
+                killmsg = message
+                break
+        if not killmsg:
+            return await ctx.send("There is no message to explode.")
+        await asyncio.sleep(.5)
+        await ctx.message.delete()
+        timer = int(amount)
+        timer -= -1
+        msg = await ctx.send(content=':bomb:' + "-" * int(timer) + ":fire:")
+        await asyncio.sleep(1)
+        while timer:
+            timer -= 1
+            await msg.edit(content=':bomb:' + "-" * int(timer) + ":fire:")
+            await asyncio.sleep(1)
+        await msg.edit(content=':boom:')
+        await asyncio.sleep(1)
+        await killmsg.delete()
+        await msg.delete()
 
 
 def setup(bot):

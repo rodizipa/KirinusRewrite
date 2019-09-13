@@ -6,14 +6,14 @@ import asyncio
 import random
 
 
-class DcCogs:
+class DcCogs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name='raid')
     async def raid(self, ctx, *args):
         """Call raids announcement. args: [optional: Owner (mention)], [optional: level : number], [optional: name]"""
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 477146466607955971 or ctx.message.channel.id == 504862373459525643:
+        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 524327345503338536 or ctx.message.channel.id == 524328420641865738 or ctx.message.channel.id == 524328850805489665:
 
             m = await ctx.send("@here")
 
@@ -24,9 +24,9 @@ class DcCogs:
                 owner = ctx.author.display_name
 
             # default raid alert
-            em = Embed(colour=await element_color('Dark'), title="Raid Alert!", description=f"@here, {owner} found a raid!", timestamp=datetime.datetime.now())
+            em = Embed(colour=await element_color('Fire'), title="WB Alert!", description=f"@here, WB is here!", timestamp=datetime.datetime.now())
             em.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
-            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png")
+            em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/616663448050335764/gumiho.png")
 
             level = None
             raid_call = None
@@ -40,10 +40,15 @@ class DcCogs:
 
             # If raid tag exists
             if raid_call:
-                if raid_call == 'aria':
-                    em.colour = await element_color('Light')
+                if raid_call == 'billy':
+                    em.colour = await element_color('Water')
                     em.description = f'@here, {owner} found an Aria!'
-                    em.set_image(url="https://cdn.discordapp.com/attachments/167280538695106560/422438159951986708/Aria.png")
+                    em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/605863990874210314/000002c2.png")
+
+                elif raid_call == 'davi':
+                    em.colour = await element_color('Dark')
+                    em.description = f'@here, {owner} found a Davi!'
+                    em.set_image(url='https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png')
 
                 elif raid_call == 'davi':
                     em.colour = await element_color('Dark')
@@ -195,6 +200,11 @@ class DcCogs:
                     em.description = f'@here, {owner} found a {raid_call}!'
                     em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/474773568660439060/iphisraid.png")
 
+                elif raid_call == 'ruin':
+                    em.colour = await element_color('Forest')
+                    em.description = f'@here, {owner} found a {raid_call}!'
+                    em.set_image(url="https://cdn.discordapp.com/attachments/448341812055244817/560826670999797770/ruin.png")
+
                 else:
                     em.description = f'@here, {owner} found a/an {raid_call}'
 
@@ -202,6 +212,7 @@ class DcCogs:
                 em_edit = em.description
                 em.description = em_edit + f"\nAlso, appears to be lvl **{level}**.\n"
 
+            await asyncio.sleep(0.5)
             await m.delete()
             await ctx.send(embed=em)
             await ctx.message.delete()
@@ -219,28 +230,70 @@ class DcCogs:
             await ctx.message.delete()
             await ctx.author.send("You can't do raid call outside of raid channel.")
 
-    @commands.command(name="wb")
+    @commands.command(name="boss")
     async def wb_cmd(self, ctx, *args):
-        if args[0] == 'join':
-            try:
-                wb_role = utils.get(ctx.guild.roles, id=512780401073455117)
-                await ctx.author.add_roles(wb_role)
-                m = await ctx.send("You have joined the WB squad.")
+        if ctx.message.channel.category.id == 360906457144885259:  #kr
+            if args[0] == 'join':
+                try:
+                    wb_role = utils.get(ctx.guild.roles, id=529552375610867723)
+                    await ctx.author.add_roles(wb_role)
+                    m = await ctx.send("You have joined the boss squad.")
+                    await asyncio.sleep(5)
+                    await ctx.message.delete()
+                    await m.delete()
+                except Exception:
+                    await asyncio.sleep(1)
+                    await ctx.message.delete()
+
+            elif args[0] == 'leave':
+                wb_role = utils.get(ctx.guild.roles, id=529552375610867723)
+                await ctx.author.remove_roles(wb_role)
+                m = await ctx.send("You left the boss squad.")
                 await asyncio.sleep(5)
                 await ctx.message.delete()
                 await m.delete()
-            except Exception:
-                await asyncio.sleep(1)
+
+        elif ctx.message.channel.category.id == 505752541582065674:  #jp
+            if args[0] == 'join':
+                try:
+                    wb_role = utils.get(ctx.guild.roles, id=531636587960991764)
+                    await ctx.author.add_roles(wb_role)
+                    m = await ctx.send("You have joined the boss squad.")
+                    await asyncio.sleep(5)
+                    await ctx.message.delete()
+                    await m.delete()
+                except Exception:
+                    await asyncio.sleep(1)
+                    await ctx.message.delete()
+
+            elif args[0] == 'leave':
+                wb_role = utils.get(ctx.guild.roles, id=531636587960991764)
+                await ctx.author.remove_roles(wb_role)
+                m = await ctx.send("You left the boss squad.")
+                await asyncio.sleep(5)
                 await ctx.message.delete()
+                await m.delete()
 
-        elif args[0] == 'leave':
-            wb_role = utils.get(ctx.guild.roles, id=512780401073455117)
-            await ctx.author.remove_roles(wb_role)
-            m = await ctx.send("You left the WB squad.")
-            await asyncio.sleep(5)
-            await ctx.message.delete()
-            await m.delete()
+        elif ctx.message.channel.category.id == 506160433447567361:  #gb
+            if args[0] == 'join':
+                try:
+                    wb_role = utils.get(ctx.guild.roles, id=545749265280925707)
+                    await ctx.author.add_roles(wb_role)
+                    m = await ctx.send("You have joined the boss squad.")
+                    await asyncio.sleep(5)
+                    await ctx.message.delete()
+                    await m.delete()
+                except Exception:
+                    await asyncio.sleep(1)
+                    await ctx.message.delete()
 
+            elif args[0] == 'leave':
+                wb_role = utils.get(ctx.guild.roles, id=545749265280925707)
+                await ctx.author.remove_roles(wb_role)
+                m = await ctx.send("You left the boss squad.")
+                await asyncio.sleep(5)
+                await ctx.message.delete()
+                await m.delete()
 
 def setup(bot):
     bot.add_cog(DcCogs(bot))

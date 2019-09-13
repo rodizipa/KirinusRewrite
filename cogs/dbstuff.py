@@ -6,7 +6,7 @@ import datetime
 import pendulum
 
 
-class DbCog:
+class DbCog(commands.Cog):
     """Database stuff"""
     def __init__(self, bot):
         self.bot = bot
@@ -91,17 +91,37 @@ class DbCog:
         """Search child info in database. Arguments: <child name>"""
 
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            query = "SELECT * FROM childs WHERE $1 in (child_call, alias1, alias2, LOWER(name));"
-            row = await self.bot.db.fetchrow(query, child_call.lower())
-
+            row = await self.bot.db.fetchrow("SELECT * FROM childs where similarity($1, child_call) > 0.8 ORDER BY $1 <-> child_call LIMIT 1", child_call.lower())
             # Checks if we got result or if we need to list:
             if row:
                 em = await formatter.child_embed(row)
                 await ctx.send(embed=em)
             else:
-                em = Embed(description=f"Child not found. Try using ?list cmd.")
-                em.set_image(url="https://i.imgur.com/cf1TReg.jpg")
-                await ctx.send(embed=em)
+                row = await self.bot.db.fetchrow("SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY $1 <-> alias1 LIMIT 1", child_call.lower())
+                if row:
+                    em = await formatter.child_embed(row)
+                    await ctx.send(embed=em)
+                else:
+                    row = await self.bot.db.fetchrow(
+                        "SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY $1 <-> alias2 LIMIT 1", child_call.lower())
+                    if row:
+                        em = await formatter.child_embed(row)
+                        await ctx.send(embed=em)
+                    else:
+                        rows = await self.bot.db.fetch("select * from childs where similarity($1, child_call) > 0.3 or similarity($1, alias1) > 0.3 or similarity($1, alias2) > 0.3 order by $1 <-> child_call LIMIT 5", child_call.lower())
+                        description = "Child not found. Try using `?list` like `?list fire` or `?list mona`.\n"
+                        if rows:
+                            description = f"{description}\n**Possible matches:**\n"
+                            for row in rows:
+                                name = f"\n * **{row['name']}**: Use `{row['child_call']}`"
+                                if row['alias1']:
+                                    name = f"{name}, `{row['alias1']}`"
+                                if row['alias2']:
+                                    name=f"{name} or `{row['alias2']}`"
+                                description = f"{description} {name}\n"
+
+                        em = Embed(description=description)
+                        await ctx.send(embed=em)
         else:
             await ctx.message.delete()
             await ctx.author.send("Don't use this cmd outside of bot channels.")

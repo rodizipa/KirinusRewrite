@@ -13,6 +13,7 @@ class Bot(commands.Bot):
         super().__init__(command_prefix=CONFIG.PREFIX, description="Destiny Child KR bot.")
         self.db = kwargs.pop("db")
         self.rt = self.loop.create_task(self.reset_task())
+        self.nick_pool = []  # For april's fools event
 
     async def reset_task(self):
         await self.wait_until_ready()
@@ -140,6 +141,7 @@ class Bot(commands.Bot):
                 role = discord.utils.get(message.author.roles, id=311943704237572097)
                 if role:
                     await formatter.kirinus_gacha(message)
+
             except Exception:
                 pass
 

@@ -7,24 +7,25 @@ import pendulum
 
 def is_admin():
     async def predicate(ctx):
-        if ctx.author.id == ctx.bot.owner_id or ctx.author.id == 224522663626801152:
+        if ctx.author.id == 114010253938524167 or ctx.author.id == 224522663626801152:
             return True
         else:
             await ctx.author.send("You have no permissions.")
             await asyncio.sleep(1)
             await ctx.message.delete()
+            return False
 
     return commands.check(predicate)
 
 
-class AdminCog:
+class AdminCog(commands.Cog):
     """Owner and Admin Stuff"""
 
     def __init__(self, bot):
         self.bot = bot
 
+    @is_admin()
     @commands.command(name='role')
-    @commands.is_owner()
     async def role(self, ctx, action, user: discord.Member, result_role: discord.Role):
         """Assign/remove roles to user."""
         if action == 'add':
@@ -63,6 +64,13 @@ class AdminCog:
             await ctx.message.channel.purge(limit=number, check=lambda m: m.author.id == mention.id)
         else:
             await ctx.message.channel.purge(limit=number)
+
+    @is_admin()
+    @commands.command(name="delmsg")
+    async def delmsg(self, ctx, msg_id: int):
+        await ctx.channel.delete_messages([discord.Object(msg_id)])
+        await asyncio.sleep(1)
+        await ctx.message.delete()
 
     @commands.command(name="inquisition")
     @commands.is_owner()
@@ -136,7 +144,7 @@ class AdminCog:
 
     @commands.is_owner()
     @commands.command(name='reload')
-    async def cog_reload(self, ctx, *, cog: str):
+    async def reload(self, ctx, *, cog: str):
         """Command to reload cog, admin only. Use path form"""
 
         try:
@@ -180,15 +188,19 @@ class AdminCog:
             await self.bot.db.release(connection)
 
             await member.add_roles(role)
-
             # Remove plankton if role is dunce
             if role.id == 311943704237572097:
                 kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
+                gb_role = discord.utils.get(ctx.guild.roles, id=506160697323814927)
+                jp_role = discord.utils.get(ctx.guild.roles, id=505746159365783563)
                 await member.remove_roles(kr_role)
+                await member.remove_roles(gb_role)
+                await member.remove_roles(jp_role)
 
-            if role.id == 506160697323814927:  # NA role
-                kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                await member.remove_roles(kr_role)
+            if role.id == 515972528016195644: #banish
+                for cache in member.roles:
+                    if not cache.name.__contains__('everyone') and not cache.name.__contains__('Banished'):
+                        await member.remove_roles(cache)
 
             await ctx.message.add_reaction('✅')
             await asyncio.sleep(5)
@@ -216,14 +228,6 @@ class AdminCog:
                     insert = "DELETE FROM assign_roles WHERE user_id = $1;"
                     await self.bot.db.execute(insert, member.id)
                 await self.bot.db.release(connection)
-
-                if role.id == 311943704237572097:  # dunce
-                    plankton = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                    await member.add_roles(plankton)
-
-                if role.id == 506160697323814927:  # NA
-                    kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                    await member.add_roles(kr_role)
 
                 await ctx.message.add_reaction('✅')
                 await asyncio.sleep(5)

@@ -23,6 +23,8 @@ async def child_embed(row):
     em.add_field(name="Tap Skill", value=row["tap_skill"], inline=False)
     em.add_field(name="Slide Skill", value=row["slide_skill"], inline=False)
     em.add_field(name="Drive Skill", value=row["drive_skill"], inline=False)
+    if row["ignition"]:
+        em.add_field(name="ɪɢɴɪᴛɪᴏɴ", value=row["ignition"], inline=False)
     if row["notes"] is not None:
         em.set_footer(text=row["notes"], icon_url="https://i.imgur.com/zcJGvMI.png")
     if row["thumbnail"] is not None:
@@ -711,3 +713,4 @@ async def random_insult(ctx):
         em.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
         await ctx.message.delete()
         await ctx.message.channel.send(embed=em)
+

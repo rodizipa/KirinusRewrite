@@ -185,7 +185,7 @@ class WaifuInstance:
                     return True
 
 
-class WaifuCog:
+class WaifuCog(commands.Cog):
     """Commands related to Waifu Gacha Minigame"""
     def __init__(self, bot):
         self.bot = bot

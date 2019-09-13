@@ -160,7 +160,7 @@ slaps = [
     'got a whip from chest. Time to try it, {} will be the target.'
 ]
 
-class FunCog:
+class FunCog(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
@@ -313,6 +313,32 @@ class FunCog:
         em2.description = end_msg
         await ctx.send(embed=em2)
 
+    @commands.command(name="saveusers")
+    async def saveusers(self, ctx):
+
+        members = []
+        members = ctx.guild.members
+        connection = await ctx.bot.db.acquire()
+
+        for member in members:
+            await ctx.bot.db.execute('insert into aprils_fools(userid, displaynick) VALUES($1,$2)', member.id, member.display_name)
+
+        await ctx.bot.db.release(connection)
+
+    @commands.command(name="nickrestore")
+    async def nick_restore(self, ctx):
+        query = "SELECT * FROM aprils_fools"
+        members = await self.bot.db.fetch(query)
+
+        for member in members:
+            user = ctx.guild.get_member(member['userid'])
+            if member:
+                try:
+                    await user.edit(nick=member['displaynick'])
+                    print(f"{member['displaynick']} restored!")
+                except:
+                    pass
+                await asyncio.sleep(0.1)
 
 
 def setup(bot):

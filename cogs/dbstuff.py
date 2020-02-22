@@ -1,13 +1,16 @@
-from discord import Embed
-from discord.ext import commands
-from utils import formatter, SimplePaginator
 import asyncio
 import datetime
+
 import pendulum
+from discord import Embed
+from discord.ext import commands
+
+from utils import formatter, SimplePaginator
 
 
 class DbCog(commands.Cog):
     """Database stuff"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -304,6 +307,79 @@ class DbCog(commands.Cog):
 
             else:
                 m = await ctx.send("maint not yet created.")
+                await asyncio.sleep(5)
+                await ctx.message.delete()
+                await m.delete()
+
+    @commands.command(name='auction')
+    async def auction(self, ctx, *args):
+        """Countdown to auction. Args: <add> 'MM/DD HH/mm'"""
+        if ctx.message.channel.id != 529546837661581312 and ctx.message.channel.id != 650512639012634626:
+            await asyncio.sleep(1)
+            await ctx.message.delete()
+            await ctx.author.send("Wrong channel mate, only in waifu gacha.")
+            return True
+        # Add/Update auction
+        if args:
+            if args[0] == 'add':
+                if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167:
+                    query = "SELECT * FROM alarms WHERE $1 = alarm_name;"
+                    row = await self.bot.db.fetchrow(query, 'auction')
+                    connection = await self.bot.db.acquire()
+
+                    # convert pen to datatime for saving in db
+
+                    if len(args) == 3:
+                        auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz='America/Toronto')
+                    else:
+                        auction_time = pendulum.parse(args[1], tz='America/Toronto', strict=False)
+
+                    auction_time = formatter.pendulum_to_datetime(auction_time)
+
+                    if row:
+                        async with connection.transaction():
+                            update = "UPDATE alarms SET alarm_time = $1  WHERE alarm_name = $2;"
+                            await self.bot.db.execute(update, auction_time, 'auction')
+                        await self.bot.db.release(connection)
+                        m = await ctx.send('auction time updated.')
+                        await asyncio.sleep(5)
+                        await m.delete()
+                    else:
+                        async with connection.transaction():
+                            insert = "INSERT INTO alarms (alarm_name, alarm_time) VALUES ($1, $2);"
+                            await self.bot.db.execute(insert, 'auction', auction_time)
+                        await self.bot.db.release(connection)
+                        m = await ctx.send('auction time created.')
+                        await asyncio.sleep(5)
+                        await m.delete()
+                    await ctx.message.delete()
+                else:
+                    ctx.message.delete()
+                    ctx.author.send("you have no permissions to do that.")
+
+        # Normal auction call
+        else:
+            query = "SELECT alarm_time FROM alarms WHERE alarm_name = $1;"
+            row = await self.bot.db.fetchrow(query, 'auction')
+            if row:
+                auction_time = row['alarm_time']
+                now = pendulum.now('America/Toronto')
+                auction_time = pendulum.instance(auction_time, tz="America/Toronto")
+                diff = auction_time.diff(now)
+
+                if now > auction_time:
+                    em = Embed(
+                        description=f":alarm_clock: This ended exactly  {diff.as_interval()} ago mate. :alarm_clock:")
+                else:
+                    em = Embed(description=f':alarm_clock: Tic tac toc. {diff.as_interval()} remaining. :alarm_clock:')
+
+                m = await ctx.send(embed=em)
+                await asyncio.sleep(20)
+                await ctx.message.delete()
+                await m.delete()
+
+            else:
+                m = await ctx.send("auction not yet created.")
                 await asyncio.sleep(5)
                 await ctx.message.delete()
                 await m.delete()

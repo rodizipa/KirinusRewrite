@@ -1,8 +1,10 @@
-from discord.ext import commands
-import discord
 import asyncio
-from utils import formatter
+
+import discord
 import pendulum
+from discord.ext import commands
+
+from utils import formatter
 
 
 def is_admin():
@@ -188,23 +190,18 @@ class AdminCog(commands.Cog):
             await self.bot.db.release(connection)
 
             await member.add_roles(role)
-            # Remove plankton if role is dunce
-            if role.id == 311943704237572097:
-                kr_role = discord.utils.get(ctx.guild.roles, id=295083791884615680)
-                gb_role = discord.utils.get(ctx.guild.roles, id=506160697323814927)
-                jp_role = discord.utils.get(ctx.guild.roles, id=505746159365783563)
-                await member.remove_roles(kr_role)
-                await member.remove_roles(gb_role)
-                await member.remove_roles(jp_role)
-
-            if role.id == 515972528016195644: #banish
+            # Remove roles if role is dunce or banished
+            if role.id == 311943704237572097 or role.id == 515972528016195644:
                 for cache in member.roles:
                     if not cache.name.__contains__('everyone') and not cache.name.__contains__('Banished'):
                         await member.remove_roles(cache)
 
             await ctx.message.add_reaction('✅')
             await asyncio.sleep(5)
-            await ctx.message.delete()
+            try:
+                await ctx.message.delete()
+            except:
+                pass
         else:
             await ctx.message.delete()
             await ctx.author.send("You have no right of using this cmd.")

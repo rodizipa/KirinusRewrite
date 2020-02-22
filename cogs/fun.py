@@ -1,11 +1,11 @@
-import random
 import asyncio
-from discord.ext import commands
-from utils import formatter
-from discord import Embed
+import random
+
 import discord
+from discord import Embed
+from discord.ext import commands
 
-
+from utils import formatter
 
 coinFlip = [
     'https://cdn.discordapp.com/attachments/448341812055244817/448502226021908490/coinsmalltails.png',
@@ -160,8 +160,9 @@ slaps = [
     'got a whip from chest. Time to try it, {} will be the target.'
 ]
 
+
 class FunCog(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name='8ball')
@@ -185,7 +186,7 @@ class FunCog(commands.Cog):
             await ctx.author.send("This command is locked to `i-am-bot`.")
 
     @commands.command(name='coin', aliases=['flip'])
-    async def flip_coin(self,ctx):
+    async def flip_coin(self, ctx):
         """Flip a coin."""
         em = await formatter.coin_embed(random.choice(coinFlip))
         m = await ctx.send(embed=em)
@@ -205,7 +206,8 @@ class FunCog(commands.Cog):
         """Chooses a random 5* that can be get from gacha. args: [wb]"""
         if args:
             if args[0] == 'wb':
-                em = Embed(description=ctx.author.display_name + " thinks that the world boss will be " + random.choice(world_bosses))
+                em = Embed(description=ctx.author.display_name + " thinks that the world boss will be " + random.choice(
+                    world_bosses))
         else:
             em = Embed(description=ctx.author.display_name + " guessed " + random.choice(five_stars))
         await ctx.send(embed=em)
@@ -301,7 +303,7 @@ class FunCog(commands.Cog):
             top_results = []
             for key, value in results.items():
                 if value == results[top_result]:
-                    top_results.append(options[emoji.index(key)+1])
+                    top_results.append(options[emoji.index(key) + 1])
             tied = ", ".join(top_results)
             if max(results.values()) == 0:
                 end_msg += "\nBah, nobody voted"
@@ -313,6 +315,20 @@ class FunCog(commands.Cog):
         em2.description = end_msg
         await ctx.send(embed=em2)
 
+    @commands.command(name="random")
+    async def random_n(self, ctx, start: int, end: int):
+        await ctx.send(random.randint(start, end))
+
+    @commands.command(name="rlist", aliases=['rl'])
+    async def random_list(self, ctx, amount: int):
+
+        l1 = [str(i + 1) for i in range(amount)]
+        random.shuffle(l1)
+        em = discord.Embed(description="||" + " ".join(l1) + "||", color=discord.colour.Color.blue())
+        await ctx.send(embed=em)
+        await asyncio.sleep(1)
+        await ctx.message.delete()
+
     @commands.command(name="saveusers")
     async def saveusers(self, ctx):
 
@@ -321,7 +337,8 @@ class FunCog(commands.Cog):
         connection = await ctx.bot.db.acquire()
 
         for member in members:
-            await ctx.bot.db.execute('insert into aprils_fools(userid, displaynick) VALUES($1,$2)', member.id, member.display_name)
+            await ctx.bot.db.execute('insert into aprils_fools(userid, displaynick) VALUES($1,$2)', member.id,
+                                     member.display_name)
 
         await ctx.bot.db.release(connection)
 

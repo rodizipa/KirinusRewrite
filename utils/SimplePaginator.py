@@ -16,17 +16,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import discord
 import asyncio
+
+import discord
 
 
 async def pager(entries, chunk: int):
     for x in range(0, len(entries), chunk):
-        yield entries[x:x+chunk]
+        yield entries[x:x + chunk]
 
 
 class SimplePaginator:
-
     __slots__ = ('entries', 'extras', 'dm', 'title', 'description', 'colour', 'footer', 'length', 'names', 'base',
                  'timeout', 'ordered', 'embed', 'prepend', 'append', 'fmt', 'controller', 'pages', 'current', 'previous',
                  'eof', 'controls', 'author', 'favorite')
@@ -101,9 +101,8 @@ class SimplePaginator:
             elif u.id == bot.user.id or r.message.id != self.base.id:
                 return False
             elif u.id != author.id:
-                if self.author:
-                    if u.id == self.author.id:
-                        return True
+                if self.author and u.id == self.author.id:
+                    return True
                 return False
             return True
 

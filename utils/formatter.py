@@ -1,6 +1,8 @@
-from discord import Colour, Embed
 import datetime
 import random
+
+from discord import Colour, Embed
+
 
 async def element_color(element):
     switch = {
@@ -14,7 +16,7 @@ async def element_color(element):
 
 
 async def child_embed(row):
-    em = Embed(color=await element_color(row["element"]), description=row["rank"])
+    em = Embed(color=await element_color(row["element"]), description=':star:' * int(row["rank"]))
     em.title = row["name"]
     em.add_field(name="Role", value=row["role"], inline=True)
     em.add_field(name="Element", value=row["element"], inline=True)

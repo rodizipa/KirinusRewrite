@@ -20,4 +20,6 @@ class UserService(DatabaseService):
         return await self.fetchrow("select karma from member where discord_id = $1", discord_id)
 
     async def removekarma(self, discord_id, value):
-        await self.execute("UPDATE member SET karma = karma - $2 WHERE discord_id = $1", discord_id, value)
+        await self.execute(
+            "UPDATE member SET karma = (CASE WHEN (karma-$2) < 0 THEN 0 ELSE (karma-$2) END) WHERE discord_id = $1",
+            discord_id, value)

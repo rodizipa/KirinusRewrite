@@ -7,6 +7,12 @@ from discord.ext import commands
 
 from utils import formatter, SimplePaginator
 
+TORONTO_TIME = 'America/Toronto'
+
+KR_TIME = 'Asia/Seoul'
+
+QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
+
 
 class DbCog(commands.Cog):
     """Database stuff"""
@@ -31,7 +37,7 @@ class DbCog(commands.Cog):
                     elif arg.lower() in ("attacker", "debuffer", "tank", "healer", "support"):
                         query_set['role'] = arg.lower()
                     elif arg.lower() in ("5", "4", "3"):
-                        query_set['rank'] = ':star:' * int(arg)
+                        query_set['rank'] = arg
                     else:
                         if query_set['query'] == '':
                             query_set['query'] = arg.lower()
@@ -84,7 +90,8 @@ class DbCog(commands.Cog):
                     result_list.append(f" {item['name']:<26}{search}")
                 await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                                       length=20, embed=False).paginate(ctx)
-
+            await asyncio.sleep(5)
+            await ctx.message.delete()
         else:
             await ctx.message.delete()
             await ctx.author.send("Don't use this cmd outside of bot channels.")
@@ -149,7 +156,7 @@ class DbCog(commands.Cog):
 
         # Add or update Tag
         elif args[0] == 'add':
-            query = "SELECT * FROM quotes WHERE $1 = invoke;"
+            query = QUOTES_WHERE_INVOKE_
             row = await self.bot.db.fetchrow(query, args[1])
             connection = await self.bot.db.acquire()
 
@@ -175,7 +182,7 @@ class DbCog(commands.Cog):
 
         # Tag Info
         elif args[0] == 'info':
-            query = "SELECT * FROM quotes WHERE $1 = invoke;"
+            query = QUOTES_WHERE_INVOKE_
             row = await self.bot.db.fetchrow(query, args[1])
 
             if row:
@@ -191,7 +198,7 @@ class DbCog(commands.Cog):
         # Removes tag
         elif args[0] == 'remove':
             if ctx.author.id == 114010253938524167:
-                query = "SELECT * FROM quotes WHERE $1 = invoke;"
+                query = QUOTES_WHERE_INVOKE_
                 row = await self.bot.db.fetchrow(query, args[1])
 
                 if row:
@@ -214,7 +221,7 @@ class DbCog(commands.Cog):
                 await m.delete()
         else:
                 # Find item
-                query = "SELECT * FROM quotes WHERE $1 = invoke;"
+                query = QUOTES_WHERE_INVOKE_
                 row = await self.bot.db.fetchrow(query, args[0])
                 if row:
                     em = await formatter.quote_embed(row)
@@ -229,12 +236,12 @@ class DbCog(commands.Cog):
     @commands.command(name='reset')
     async def reset(self, ctx):
         """Countdown till next reset."""
-        now = pendulum.now('Asia/Seoul')
+        now = pendulum.now(KR_TIME)
 
         if now.hour > 3:
-            quest_reset = pendulum.tomorrow('Asia/Seoul').add(hours=4)
+            quest_reset = pendulum.tomorrow(KR_TIME).add(hours=4)
         else:
-            quest_reset = pendulum.today('Asia/Seoul').add(hours=4)
+            quest_reset = pendulum.today(KR_TIME).add(hours=4)
 
         reset_countdown = quest_reset.diff(now)
         em = Embed(description=f":alarm_clock: The next reset will happen in {reset_countdown.as_interval()}. :alarm_clock:")
@@ -258,9 +265,9 @@ class DbCog(commands.Cog):
                     # convert pen to datatime for saving in db
 
                     if len(args) == 3:
-                        maint_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz='Asia/Seoul')
+                        maint_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=KR_TIME)
                     else:
-                        maint_time = pendulum.parse(args[1], tz='Asia/Seoul', strict=False)
+                        maint_time = pendulum.parse(args[1], tz=KR_TIME, strict=False)
 
                     maint_time = formatter.pendulum_to_datetime(maint_time)
 
@@ -291,14 +298,15 @@ class DbCog(commands.Cog):
             row = await self.bot.db.fetchrow(query, 'maint')
             if row:
                 maint_time = row['alarm_time']
-                now = pendulum.now('Asia/Seoul')
-                maint_time = pendulum.instance(maint_time, tz="Asia/Seoul")
+                now = pendulum.now(KR_TIME)
+                maint_time = pendulum.instance(maint_time, tz=KR_TIME)
                 diff = maint_time.diff(now)
 
                 if now > maint_time:
                     em = Embed(description=f":alarm_clock: Maint started {diff.as_interval()} ago. :alarm_clock:")
                 else:
-                    em = Embed(description=f':alarm_clock: Maint will start in {diff.as_interval()} from now. :alarm_clock:')
+                    em = Embed(
+                        description=f':alarm_clock: Maint will start in {diff.as_interval()} from now. :alarm_clock:')
 
                 m = await ctx.send(embed=em)
                 await asyncio.sleep(20)
@@ -330,9 +338,9 @@ class DbCog(commands.Cog):
                     # convert pen to datatime for saving in db
 
                     if len(args) == 3:
-                        auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz='America/Toronto')
+                        auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=TORONTO_TIME)
                     else:
-                        auction_time = pendulum.parse(args[1], tz='America/Toronto', strict=False)
+                        auction_time = pendulum.parse(args[1], tz=TORONTO_TIME, strict=False)
 
                     auction_time = formatter.pendulum_to_datetime(auction_time)
 
@@ -363,7 +371,7 @@ class DbCog(commands.Cog):
             row = await self.bot.db.fetchrow(query, 'auction')
             if row:
                 auction_time = row['alarm_time']
-                now = pendulum.now('America/Toronto')
+                now = pendulum.now(TORONTO_TIME)
                 auction_time = pendulum.instance(auction_time, tz="America/Toronto")
                 diff = auction_time.diff(now)
 

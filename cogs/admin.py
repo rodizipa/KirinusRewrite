@@ -272,7 +272,7 @@ class AdminCog(commands.Cog):
     @commands.is_owner()
     @commands.command(name='trashping')
     async def trashping(self, ctx, user: discord.Member, num: int):
-        for i in range(num):
+        for _ in range(num):
             await ctx.send(f"{user.mention}")
             await asyncio.sleep(0)
 

@@ -1,5 +1,6 @@
 import asyncio
 
+import discord
 from discord.ext import commands
 
 from service.userService import UserService
@@ -26,10 +27,11 @@ class KarmaCog(commands.Cog):
     @commands.command(name="karma", aliases=['k'])
     async def karma(self, ctx, *args):
         """Kirinus karma system. [?k] (add/remove/balance) [optional for balance: @targetMention] [optional:value]"""
+        em = discord.Embed()
         m = None
         if len(args) < 1:
-            m = await ctx.send(
-                "Use ?karma[?k] (add/remove/balance) [optional for balance: @targetMention] [optional:value]")
+            em.description = "Use ?karma[?k] (add/remove/balance) [optional for balance: @targetMention] [optional:value]"
+            m = await ctx.send(embed=em)
         else:
             target = ctx.message.mentions[0] if len(ctx.message.mentions) > 0 else ctx.author
 
@@ -37,18 +39,21 @@ class KarmaCog(commands.Cog):
                 value = checkdigitarguments(args, 1)
                 await self.member_exist(target)
                 await self.userS.addkarma(target.id, value)
-                m = await ctx.send(f"User {target.mention} received {value} karma points.")
+                em.description = f"User {target.mention} received {value} karma points."
+                m = await ctx.send(embed=em)
 
             elif args[0].lower() == "remove" and len(ctx.message.mentions) > 0 and is_admin(ctx):
                 value = checkdigitarguments(args, 1)
                 await self.member_exist(target)
                 await self.userS.removekarma(target.id, value)
-                m = await ctx.send(f"User {target.mention} lost {value} karma points.")
+                em.description = f"User {target.mention} lost {value} karma points."
+                m = await ctx.send(embed=em)
 
             elif args[0].lower() == "balance":
                 await self.member_exist(target)
                 value = await self.userS.userbalance(target.id)
-                m = await ctx.send(f"{target.display_name}'s balance: {value['karma']}")
+                em.description = f"{target.display_name}'s balance: {value['karma']}"
+                m = await ctx.send(embed=em)
 
         await asyncio.sleep(5)
         await ctx.message.delete()

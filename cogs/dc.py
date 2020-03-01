@@ -71,12 +71,6 @@ class DcCogs(commands.Cog):
                     em.set_image(
                         url='https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png')
 
-                elif raid_call == 'davi':
-                    em.colour = await element_color('Dark')
-                    em.description = f'@here, {owner} found a Davi!'
-                    em.set_image(
-                        url='https://cdn.discordapp.com/attachments/448341812055244817/504999706922057729/ragnadaviraid.png')
-
                 elif raid_call == 'navi':
                     em.colour = await element_color('Fire')
                     em.description = f'@here, {owner} found a Navi!'
@@ -287,16 +281,14 @@ class DcCogs(commands.Cog):
     async def join(self, ctx, *args):
         if ctx.message.channel.category.id == 360907134822514688:  # help category
             if args[0] == 'waifu':
-                try:
-                    waifu_role = utils.get(ctx.guild.roles, id=646764689245732872)
-                    await ctx.author.add_roles(waifu_role)
-                    m = await ctx.send("You have joined the weeb group.")
-                    await asyncio.sleep(5)
-                    await ctx.message.delete()
+                waifu_role = utils.get(ctx.guild.roles, id=646764689245732872)
+                await ctx.author.add_roles(waifu_role)
+                m = await ctx.send("You have joined the weeb group.")
+                await asyncio.sleep(5)
+                await ctx.message.delete()
+                if m:
                     await m.delete()
-                except Exception as e:
-                    await asyncio.sleep(1)
-                    await ctx.message.delete()
+
 
         elif ctx.message.channel.category.id == 360906457144885259:  # kr
             if args[0] == 'boss':
@@ -356,14 +348,13 @@ class DcCogs(commands.Cog):
                 await ctx.message.delete()
                 await m.delete()
 
-        elif ctx.message.channel.category.id == 505752541582065674:  # jp
-            if args[0] == 'boss':
-                wb_role = utils.get(ctx.guild.roles, id=531636587960991764)
-                await ctx.author.remove_roles(wb_role)
-                m = await ctx.send("You left the boss squad.")
-                await asyncio.sleep(5)
-                await ctx.message.delete()
-                await m.delete()
+        elif ctx.message.channel.category.id == 505752541582065674 and args[0] == 'boss':
+            wb_role = utils.get(ctx.guild.roles, id=531636587960991764)
+            await ctx.author.remove_roles(wb_role)
+            m = await ctx.send("You left the boss squad.")
+            await asyncio.sleep(5)
+            await ctx.message.delete()
+            await m.delete()
 
 
 def setup(bot):

@@ -164,10 +164,7 @@ class AdminCog(commands.Cog):
     async def assign(self, ctx, member: discord.Member, role: discord.Role, timestr):
         if ctx.author.id in (224522663626801152, 114010253938524167):
 
-            if member is None:
-                ctx.send("Invalid Member.")
-            elif role is None:
-                ctx.send("Invalid role.")
+            await self.check_valid_parameters(ctx, member, role)
 
             time_list = [int(x) for x in timestr.split(':')]
 
@@ -182,6 +179,7 @@ class AdminCog(commands.Cog):
                 return True
 
             time = formatter.pendulum_to_datetime(time)
+
             connection = await self.bot.db.acquire()
 
             async with connection.transaction():
@@ -189,22 +187,28 @@ class AdminCog(commands.Cog):
                 await self.bot.db.execute(insert, member.id, role.id, ctx.message.guild.id, time)
             await self.bot.db.release(connection)
 
-            await member.add_roles(role)
-            # Remove roles if role is dunce or banished
-            if role.id == 311943704237572097 or role.id == 515972528016195644:
-                for cache in member.roles:
-                    if not cache.name.__contains__('everyone') and not cache.name.__contains__('Banished'):
-                        await member.remove_roles(cache)
+            await self.add_assigned_role(member, role)
 
             await ctx.message.add_reaction('✅')
-            await asyncio.sleep(5)
-            try:
-                await ctx.message.delete()
-            except:
-                pass
         else:
-            await ctx.message.delete()
             await ctx.author.send("You have no right of using this cmd.")
+
+        await asyncio.sleep(5)
+        await ctx.message.delete()
+
+    async def add_assigned_role(self, member, role):
+        await member.add_roles(role)
+        # Remove roles if role is dunce or banished
+        if role.id == 311943704237572097 or role.id == 515972528016195644:
+            for cache in member.roles:
+                if not cache.name.__contains__('everyone') and not cache.name.__contains__('Banished'):
+                    await member.remove_roles(cache)
+
+    async def check_valid_parameters(self, ctx, member, role):
+        if member is None:
+            ctx.send("Invalid Member.")
+        elif role is None:
+            ctx.send("Invalid role.")
 
     @commands.command(name="deassign")
     async def deassign(self, ctx, member: discord.Member):

@@ -4,7 +4,7 @@ Destiny child stuff related bot based using discord.py rewrite API wrapper.
 
 Here is a overview of Kirinus Functions.
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=rodizipa_KirinusRewrite)](https://sonarcloud.io/dashboard?id=rodizipa_KirinusRewrite)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=rodizipa_KirinusRewrite&metric=alert_status)](https://sonarcloud.io/dashboard?id=rodizipa_KirinusRewrite)
 
 ## Commands
 

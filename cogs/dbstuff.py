@@ -5,6 +5,7 @@ import pendulum
 from discord import Embed
 from discord.ext import commands
 
+from service.alarmsService import AlarmService
 from utils import formatter, SimplePaginator, helpers
 
 TORONTO_TIME = 'America/Toronto'
@@ -12,11 +13,29 @@ KR_TIME = 'Asia/Seoul'
 QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
 
 
+class WrongChannel(commands.CheckFailure):
+    pass
+
+
+def auction_channel():
+    async def predicate(ctx):
+        if ctx.message.channel.id == 529546837661581312 or ctx.message.channel.id == 650512639012634626:
+            return True
+        raise WrongChannel('Wrong channel mate, only in waifu gacha.')
+
+    return commands.check(predicate)
+
+
+def admin_check(ctx):
+    return True if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167 else False
+
+
 class DbCog(commands.Cog):
     """Database stuff"""
 
     def __init__(self, bot):
         self.bot = bot
+        self.alarmService = AlarmService(self.bot)
 
     @commands.command(name='list')
     async def list(self, ctx, *args):
@@ -286,52 +305,38 @@ class DbCog(commands.Cog):
             else:
                 await helpers.message_handler("Maint not yet created.", ctx, 5)
 
+    @auction_channel()
     @commands.command(name='auction')
     async def auction(self, ctx, *args):
         """Countdown to auction. Args: <add> 'MM/DD HH/mm'"""
-        if ctx.message.channel.id != 529546837661581312 and ctx.message.channel.id != 650512639012634626:
-            await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
-            return True
+
         # Add/Update auction
         if args:
             if args[0] == 'add':
-                if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167:
-                    query = "SELECT * FROM alarms WHERE $1 = alarm_name;"
-                    row = await self.bot.db.fetchrow(query, 'auction')
-                    connection = await self.bot.db.acquire()
+                if admin_check(ctx):
+                    row = await self.alarmService.get_alarm('auction')
 
-                    # convert pen to datatime for saving in db
-
-                    if len(args) == 3:
-                        auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=TORONTO_TIME)
-                    else:
-                        auction_time = pendulum.parse(args[1], tz=TORONTO_TIME, strict=False)
-
+                    auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=TORONTO_TIME) \
+                        if len(args) == 3 else pendulum.parse(args[1], tz=TORONTO_TIME, strict=False)
                     auction_time = formatter.pendulum_to_datetime(auction_time)
 
                     if row:
-                        async with connection.transaction():
-                            update = "UPDATE alarms SET alarm_time = $1  WHERE alarm_name = $2;"
-                            await self.bot.db.execute(update, auction_time, 'auction')
-                        await self.bot.db.release(connection)
+                        await self.alarmService.update_alarm('auction', auction_time)
                         await helpers.message_handler("auction time updated.", ctx, 5)
                     else:
-                        async with connection.transaction():
-                            insert = "INSERT INTO alarms (alarm_name, alarm_time) VALUES ($1, $2);"
-                            await self.bot.db.execute(insert, 'auction', auction_time)
-                        await self.bot.db.release(connection)
+                        await self.alarmService.insert_alarm('auction', auction_time)
                         await helpers.message_handler("auction time created.", ctx, 5)
                 else:
                     await helpers.message_denied("you have no permissions to do that.", ctx, pm=True)
 
         # Normal auction call
         else:
-            query = "SELECT alarm_time FROM alarms WHERE alarm_name = $1;"
-            row = await self.bot.db.fetchrow(query, 'auction')
+            row = await self.alarmService.get_alarm('auction')
+
             if row:
                 auction_time = row['alarm_time']
                 now = pendulum.now(TORONTO_TIME)
-                auction_time = pendulum.instance(auction_time, tz="America/Toronto")
+                auction_time = pendulum.instance(auction_time, tz=TORONTO_TIME)
                 diff = auction_time.diff(now)
 
                 em = Embed(
@@ -342,6 +347,11 @@ class DbCog(commands.Cog):
 
             else:
                 await helpers.message_handler("Auction not yet created.", 5)
+
+    @auction.error
+    async def auction_error(self, ctx, error):
+        if isinstance(error, WrongChannel):
+            await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
 
 
 def setup(bot):

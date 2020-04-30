@@ -5,12 +5,10 @@ import pendulum
 from discord import Embed
 from discord.ext import commands
 
-from utils import formatter, SimplePaginator
+from utils import formatter, SimplePaginator, helpers
 
 TORONTO_TIME = 'America/Toronto'
-
 KR_TIME = 'Asia/Seoul'
-
 QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
 
 
@@ -23,7 +21,7 @@ class DbCog(commands.Cog):
     @commands.command(name='list')
     async def list(self, ctx, *args):
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            query_set={
+            query_set = {
                 "query": '',
                 "element": None,
                 "rank": None,
@@ -93,32 +91,38 @@ class DbCog(commands.Cog):
             await asyncio.sleep(5)
             await ctx.message.delete()
         else:
-            await ctx.message.delete()
-            await ctx.author.send("Don't use this cmd outside of bot channels.")
+            await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
 
     @commands.command(name='child')
     async def child(self, ctx, *, child_call: str):
         """Search child info in database. Arguments: <child name>"""
 
         if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            row = await self.bot.db.fetchrow("SELECT * FROM childs where similarity($1, child_call) > 0.8 ORDER BY $1 <-> child_call LIMIT 1", child_call.lower())
+            row = await self.bot.db.fetchrow(
+                "SELECT * FROM childs where similarity($1, child_call) > 0.8 ORDER BY $1 <-> child_call LIMIT 1",
+                child_call.lower())
             # Checks if we got result or if we need to list:
             if row:
                 em = await formatter.child_embed(row)
                 await ctx.send(embed=em)
             else:
-                row = await self.bot.db.fetchrow("SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY $1 <-> alias1 LIMIT 1", child_call.lower())
+                row = await self.bot.db.fetchrow(
+                    "SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY $1 <-> alias1 LIMIT 1",
+                    child_call.lower())
                 if row:
                     em = await formatter.child_embed(row)
                     await ctx.send(embed=em)
                 else:
                     row = await self.bot.db.fetchrow(
-                        "SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY $1 <-> alias2 LIMIT 1", child_call.lower())
+                        "SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY $1 <-> alias2 LIMIT 1",
+                        child_call.lower())
                     if row:
                         em = await formatter.child_embed(row)
                         await ctx.send(embed=em)
                     else:
-                        rows = await self.bot.db.fetch("select * from childs where similarity($1, child_call) > 0.3 or similarity($1, alias1) > 0.3 or similarity($1, alias2) > 0.3 order by $1 <-> child_call LIMIT 5", child_call.lower())
+                        rows = await self.bot.db.fetch(
+                            "select * from childs where similarity($1, child_call) > 0.3 or similarity($1, alias1) > 0.3 or similarity($1, alias2) > 0.3 order by $1 <-> child_call LIMIT 5",
+                            child_call.lower())
                         description = "Child not found. Try using `?list` like `?list fire` or `?list mona`.\n"
                         if rows:
                             description = f"{description}\n**Possible matches:**\n"
@@ -127,14 +131,13 @@ class DbCog(commands.Cog):
                                 if row['alias1']:
                                     name = f"{name}, `{row['alias1']}`"
                                 if row['alias2']:
-                                    name=f"{name} or `{row['alias2']}`"
+                                    name = f"{name} or `{row['alias2']}`"
                                 description = f"{description} {name}\n"
 
                         em = Embed(description=description)
                         await ctx.send(embed=em)
         else:
-            await ctx.message.delete()
-            await ctx.author.send("Don't use this cmd outside of bot channels.")
+            await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
 
     @commands.command(name='quote', aliases=['tag'])
     async def quote(self, ctx, *args):
@@ -151,7 +154,8 @@ class DbCog(commands.Cog):
             invoke_list = []
             for item in invoke_records:
                 invoke_list.append(item['invoke'])
-            await SimplePaginator.SimplePaginator(entries=invoke_list, title='Kirinus Quote List', length=20, dm=True).paginate(ctx)
+            await SimplePaginator.SimplePaginator(entries=invoke_list, title='Kirinus Quote List', length=20,
+                                                  dm=True).paginate(ctx)
             await ctx.message.delete()
 
         # Add or update Tag
@@ -166,19 +170,14 @@ class DbCog(commands.Cog):
                     await self.bot.db.execute(update, args[2], datetime.datetime.now(), ctx.author.id,
                                               ctx.author.display_name, args[1])
                 await self.bot.db.release(connection)
-                m = await ctx.send('Tag updated.')
-                await asyncio.sleep(5)
-                await m.delete()
+                await helpers.message_handler("Tag updated.", ctx, 5)
             else:
                 async with connection.transaction():
                     insert = "INSERT INTO quotes (invoke, text, created_by, created_at, user_id) VALUES ($1, $2, $3, $4, $5);"
                     await self.bot.db.execute(insert, args[1], args[2], ctx.author.name, datetime.datetime.now(),
                                               ctx.author.id)
                 await self.bot.db.release(connection)
-                m = await ctx.send('Tag created.')
-                await asyncio.sleep(5)
-                await m.delete()
-            await ctx.message.delete()
+                await helpers.message_handler("Tag created", ctx, 5)
 
         # Tag Info
         elif args[0] == 'info':
@@ -186,14 +185,10 @@ class DbCog(commands.Cog):
             row = await self.bot.db.fetchrow(query, args[1])
 
             if row:
-                em = await formatter.quote_info(ctx,row)
-                m = await ctx.send(embed=em)
+                em = await formatter.quote_info(ctx, row)
+                await helpers.message_handler(em, ctx, 20, embed=True)
             else:
-                m = await ctx.send("Try again when you know what you're searching for.")
-
-            await ctx.message.delete()
-            await asyncio.sleep(20)
-            await m.delete()
+                await helpers.message_handler("Try again when you know what you're searching for.", ctx, 20)
 
         # Removes tag
         elif args[0] == 'remove':
@@ -207,48 +202,32 @@ class DbCog(commands.Cog):
                         insert = "DELETE FROM quotes WHERE invoke = $1"
                         await self.bot.db.execute(insert, args[1])
                     await self.bot.db.release(connection)
-                    m = await ctx.send("Tag Removed.")
-                    await asyncio.sleep(5)
-                    await m.delete()
+                    await helpers.message_handler("Tag Removed.", ctx, 5)
                 else:
-                    m = await ctx.send("Come back when you know what You're doing.")
-                    await asyncio.sleep(5)
-                    await m.delete()
+                    await helpers.message_handler("Come back when you know what You're doing.", ctx, 5)
             else:
-                m = await ctx.send("You have no permissions to do that D:<")
-                await asyncio.sleep(5)
-                await ctx.message.delete()
-                await m.delete()
+                await helpers.message_handler("You have no permissions to do that D:<", ctx, 5)
         else:
-                # Find item
-                query = QUOTES_WHERE_INVOKE_
-                row = await self.bot.db.fetchrow(query, args[0])
-                if row:
-                    em = await formatter.quote_embed(row)
-                    em.set_footer(text="Invoked by: " + ctx.author.display_name)
-                    await ctx.send(embed=em)
-                    await ctx.message.delete()
-                else:
-                    m = await ctx.send("Quote not found.")
-                    await asyncio.sleep(5)
-                    await m.delete()
+            # Find item
+            query = QUOTES_WHERE_INVOKE_
+            row = await self.bot.db.fetchrow(query, args[0])
+            if row:
+                em = await formatter.quote_embed(row)
+                em.set_footer(text="Invoked by: " + ctx.author.display_name)
+                await helpers.message_handler(em, ctx, embed=True, delete=False)
+            else:
+                await helpers.message_handler("Quote not found.", ctx, 5)
 
     @commands.command(name='reset')
     async def reset(self, ctx):
         """Countdown till next reset."""
         now = pendulum.now(KR_TIME)
-
-        if now.hour > 3:
-            quest_reset = pendulum.tomorrow(KR_TIME).add(hours=4)
-        else:
-            quest_reset = pendulum.today(KR_TIME).add(hours=4)
+        quest_reset = pendulum.tomorrow(KR_TIME).add(hours=4) if now.hour > 3 else pendulum.today(KR_TIME).add(hours=4)
 
         reset_countdown = quest_reset.diff(now)
-        em = Embed(description=f":alarm_clock: The next reset will happen in {reset_countdown.as_interval()}. :alarm_clock:")
-        m = await ctx.send(embed=em)
-        await asyncio.sleep(20)
-        await ctx.message.delete()
-        await m.delete()
+        em = Embed(
+            description=f":alarm_clock: The next reset will happen in {reset_countdown.as_interval()}. :alarm_clock:")
+        await helpers.message_handler(em, ctx, 20, embed=True)
 
     @commands.command(name='maint')
     async def maint(self, ctx, *args):
@@ -276,21 +255,15 @@ class DbCog(commands.Cog):
                             update = "UPDATE alarms SET alarm_time = $1  WHERE alarm_name = $2;"
                             await self.bot.db.execute(update, maint_time, 'maint')
                         await self.bot.db.release(connection)
-                        m = await ctx.send('Maint time updated.')
-                        await asyncio.sleep(5)
-                        await m.delete()
+                        await helpers.message_handler("Maint time updated", ctx, 5)
                     else:
                         async with connection.transaction():
                             insert = "INSERT INTO alarms (alarm_name, alarm_time) VALUES ($1, $2);"
                             await self.bot.db.execute(insert, 'maint', maint_time)
                         await self.bot.db.release(connection)
-                        m = await ctx.send('Maint time created.')
-                        await asyncio.sleep(5)
-                        await m.delete()
-                    await ctx.message.delete()
+                        await helpers.message_handler("Maint time created", ctx, 5)
                 else:
-                    ctx.message.delete()
-                    ctx.author.send("you have no permissions to do that.")
+                    await helpers.message_denied("You have no permissions to do that", ctx, pm=True)
 
         # Normal Maint call
         else:
@@ -308,24 +281,16 @@ class DbCog(commands.Cog):
                     em = Embed(
                         description=f':alarm_clock: Maint will start in {diff.as_interval()} from now. :alarm_clock:')
 
-                m = await ctx.send(embed=em)
-                await asyncio.sleep(20)
-                await ctx.message.delete()
-                await m.delete()
+                await helpers.message_handler(em, ctx, 20, embed=True)
 
             else:
-                m = await ctx.send("maint not yet created.")
-                await asyncio.sleep(5)
-                await ctx.message.delete()
-                await m.delete()
+                await helpers.message_handler("Maint not yet created.", ctx, 5)
 
     @commands.command(name='auction')
     async def auction(self, ctx, *args):
         """Countdown to auction. Args: <add> 'MM/DD HH/mm'"""
         if ctx.message.channel.id != 529546837661581312 and ctx.message.channel.id != 650512639012634626:
-            await asyncio.sleep(1)
-            await ctx.message.delete()
-            await ctx.author.send("Wrong channel mate, only in waifu gacha.")
+            await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
             return True
         # Add/Update auction
         if args:
@@ -349,21 +314,15 @@ class DbCog(commands.Cog):
                             update = "UPDATE alarms SET alarm_time = $1  WHERE alarm_name = $2;"
                             await self.bot.db.execute(update, auction_time, 'auction')
                         await self.bot.db.release(connection)
-                        m = await ctx.send('auction time updated.')
-                        await asyncio.sleep(5)
-                        await m.delete()
+                        await helpers.message_handler("auction time updated.", ctx, 5)
                     else:
                         async with connection.transaction():
                             insert = "INSERT INTO alarms (alarm_name, alarm_time) VALUES ($1, $2);"
                             await self.bot.db.execute(insert, 'auction', auction_time)
                         await self.bot.db.release(connection)
-                        m = await ctx.send('auction time created.')
-                        await asyncio.sleep(5)
-                        await m.delete()
-                    await ctx.message.delete()
+                        await helpers.message_handler("auction time created.", ctx, 5)
                 else:
-                    ctx.message.delete()
-                    ctx.author.send("you have no permissions to do that.")
+                    await helpers.message_denied("you have no permissions to do that.", ctx, pm=True)
 
         # Normal auction call
         else:
@@ -375,22 +334,14 @@ class DbCog(commands.Cog):
                 auction_time = pendulum.instance(auction_time, tz="America/Toronto")
                 diff = auction_time.diff(now)
 
-                if now > auction_time:
-                    em = Embed(
-                        description=f":alarm_clock: This ended exactly  {diff.as_interval()} ago mate. :alarm_clock:")
-                else:
-                    em = Embed(description=f':alarm_clock: Tic tac toc. {diff.as_interval()} remaining. :alarm_clock:')
-
-                m = await ctx.send(embed=em)
-                await asyncio.sleep(20)
-                await ctx.message.delete()
-                await m.delete()
+                em = Embed(
+                    description=f":alarm_clock: This ended exactly  {diff.as_interval()} ago mate. :alarm_clock:") if \
+                    now > auction_time else Embed(
+                    description=f':alarm_clock: Tic tac toc. {diff.as_interval()} remaining. :alarm_clock:')
+                await helpers.message_handler(em, 20, embed=True)
 
             else:
-                m = await ctx.send("auction not yet created.")
-                await asyncio.sleep(5)
-                await ctx.message.delete()
-                await m.delete()
+                await helpers.message_handler("Auction not yet created.", 5)
 
 
 def setup(bot):

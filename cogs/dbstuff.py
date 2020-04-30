@@ -8,14 +8,13 @@ from discord.ext import commands
 from service.alarmsService import AlarmService
 from utils import formatter, SimplePaginator, helpers
 
-TORONTO_TIME = 'America/Toronto'
+TORONTO_TIME = "America/Toronto"
 KR_TIME = 'Asia/Seoul'
 QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
 
 
 class WrongChannel(commands.CheckFailure):
     pass
-
 
 def auction_channel():
     async def predicate(ctx):
@@ -36,6 +35,14 @@ class DbCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.alarmService = AlarmService(self.bot)
+
+    async def add_alarm_routine(self, ctx, row, alarm, time, display_name):
+        if row:
+            await self.alarmService.update_alarm(alarm, time)
+            await helpers.message_handler(f"{display_name} time updated.", ctx, 5)
+        else:
+            await self.alarmService.insert_alarm(alarm, time)
+            await helpers.message_handler(f"{display_name} time created.", ctx, 5)
 
     @commands.command(name='list')
     async def list(self, ctx, *args):
@@ -252,56 +259,25 @@ class DbCog(commands.Cog):
     async def maint(self, ctx, *args):
         """Countdown to maint. Args: <add> 'MM/DD HH/mm'"""
 
-        # Add/Update maint
-        if args:
-            if args[0] == 'add':
-                if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167:
-                    query = "SELECT * FROM alarms WHERE $1 = alarm_name;"
-                    row = await self.bot.db.fetchrow(query, 'maint')
-                    connection = await self.bot.db.acquire()
-
-                    # convert pen to datatime for saving in db
-
-                    if len(args) == 3:
-                        maint_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=KR_TIME)
-                    else:
-                        maint_time = pendulum.parse(args[1], tz=KR_TIME, strict=False)
-
-                    maint_time = formatter.pendulum_to_datetime(maint_time)
-
-                    if row:
-                        async with connection.transaction():
-                            update = "UPDATE alarms SET alarm_time = $1  WHERE alarm_name = $2;"
-                            await self.bot.db.execute(update, maint_time, 'maint')
-                        await self.bot.db.release(connection)
-                        await helpers.message_handler("Maint time updated", ctx, 5)
-                    else:
-                        async with connection.transaction():
-                            insert = "INSERT INTO alarms (alarm_name, alarm_time) VALUES ($1, $2);"
-                            await self.bot.db.execute(insert, 'maint', maint_time)
-                        await self.bot.db.release(connection)
-                        await helpers.message_handler("Maint time created", ctx, 5)
-                else:
-                    await helpers.message_denied("You have no permissions to do that", ctx, pm=True)
-
-        # Normal Maint call
+        row = await self.alarmService.get_alarm('maint')
+        if args and args[0] == 'add':
+            if admin_check(ctx):
+                maint_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=KR_TIME) if len(args) == 3 \
+                    else pendulum.parse(args[1], tz=KR_TIME, strict=False)
+                maint_time = formatter.pendulum_to_datetime(maint_time)
+                await self.add_alarm_routine(ctx, row, 'maint', maint_time, 'Maint')
+            else:
+                await helpers.message_denied("You have no permissions to do that", ctx, pm=True)
         else:
-            query = "SELECT alarm_time FROM alarms WHERE alarm_name = $1;"
-            row = await self.bot.db.fetchrow(query, 'maint')
             if row:
                 maint_time = row['alarm_time']
-                now = pendulum.now(KR_TIME)
                 maint_time = pendulum.instance(maint_time, tz=KR_TIME)
+                now = pendulum.now(KR_TIME)
                 diff = maint_time.diff(now)
-
-                if now > maint_time:
-                    em = Embed(description=f":alarm_clock: Maint started {diff.as_interval()} ago. :alarm_clock:")
-                else:
-                    em = Embed(
-                        description=f':alarm_clock: Maint will start in {diff.as_interval()} from now. :alarm_clock:')
-
+                em = Embed(description=f":alarm_clock: Maint started {diff.as_interval()} ago. :alarm_clock:") if \
+                    now > maint_time else Embed(
+                    description=f':alarm_clock: Maint will start in {diff.as_interval()} from now. :alarm_clock:')
                 await helpers.message_handler(em, ctx, 20, embed=True)
-
             else:
                 await helpers.message_handler("Maint not yet created.", ctx, 5)
 
@@ -310,41 +286,26 @@ class DbCog(commands.Cog):
     async def auction(self, ctx, *args):
         """Countdown to auction. Args: <add> 'MM/DD HH/mm'"""
 
-        # Add/Update auction
+        row = await self.alarmService.get_alarm('auction')
         if args:
-            if args[0] == 'add':
-                if admin_check(ctx):
-                    row = await self.alarmService.get_alarm('auction')
-
-                    auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=TORONTO_TIME) \
-                        if len(args) == 3 else pendulum.parse(args[1], tz=TORONTO_TIME, strict=False)
-                    auction_time = formatter.pendulum_to_datetime(auction_time)
-
-                    if row:
-                        await self.alarmService.update_alarm('auction', auction_time)
-                        await helpers.message_handler("auction time updated.", ctx, 5)
-                    else:
-                        await self.alarmService.insert_alarm('auction', auction_time)
-                        await helpers.message_handler("auction time created.", ctx, 5)
-                else:
-                    await helpers.message_denied("you have no permissions to do that.", ctx, pm=True)
-
-        # Normal auction call
+            if args[0] == 'add' and admin_check(ctx):
+                auction_time = pendulum.from_format(f'{args[1]} {args[2]}', 'MM/DD HH:mm', tz=TORONTO_TIME) \
+                    if len(args) == 3 else pendulum.parse(args[1], tz=TORONTO_TIME, strict=False)
+                auction_time = formatter.pendulum_to_datetime(auction_time)
+                await self.add_alarm_routine(ctx, row, 'auction', auction_time, 'Auction')
+            else:
+                await helpers.message_denied("you have no permissions to do that.", ctx, pm=True)
         else:
-            row = await self.alarmService.get_alarm('auction')
-
             if row:
                 auction_time = row['alarm_time']
                 now = pendulum.now(TORONTO_TIME)
                 auction_time = pendulum.instance(auction_time, tz=TORONTO_TIME)
                 diff = auction_time.diff(now)
-
                 em = Embed(
                     description=f":alarm_clock: This ended exactly  {diff.as_interval()} ago mate. :alarm_clock:") if \
                     now > auction_time else Embed(
                     description=f':alarm_clock: Tic tac toc. {diff.as_interval()} remaining. :alarm_clock:')
                 await helpers.message_handler(em, 20, embed=True)
-
             else:
                 await helpers.message_handler("Auction not yet created.", 5)
 

@@ -38,10 +38,14 @@ def admin_check(ctx):
 
 
 async def generate_search_list(ctx, invoke_records):
-    result_list = [f"{'Name':<25} Search Terms", ""]
+    result_list = [f"{'Name':<25}  Search Terms", " "]
     for item in invoke_records:
-        search = f"{item['child_call']} {item.get('alias1', '')} {item.get('alias2', '')}"
-        result_list.append(f" {item['name']:<26}{search}")
+        search = f" {item['child_call']}"
+        if item['alias1']:
+            search = search + f", {item['alias1']}"
+        if item['alias2']:
+            search = search + f", {item['alias2']}"
+        result_list.append(f"{item['name']:<26}{search}")
     await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                           length=20, embed=False).paginate(ctx)
 
@@ -119,7 +123,7 @@ class DbCog(commands.Cog):
                     if row['alias1']:
                         unit = unit + f", `{row['alias1']}`"
                     if row['alias2']:
-                        unit = unit + " or `{row['alias2']}`"
+                        unit = unit + f" or `{row['alias2']}`"
                     description = f"{description} {unit}\n"
             em = Embed(description=description)
         await ctx.send(embed=em)
@@ -137,7 +141,8 @@ class DbCog(commands.Cog):
             await ctx.message.delete()
             return
 
-        quote = await self.quoteService.find_one(args[1])
+        quote = await self.quoteService.find_one(args[1]) if args[0] in ('list', 'add', 'info', 'remove', 'help') else \
+            await self.quoteService.find_one(args[0])
         if args[0] == 'add':
             await self.quote_add_routine(ctx, args, quote)
         elif args[0] == 'info':
@@ -222,15 +227,24 @@ class DbCog(commands.Cog):
         if isinstance(error, WrongChannel):
             await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
 
-    @quote_delete_routine.error
-    async def quote_delete_error(self, ctx, error):
-        await helpers.message_handler("You have no permissions to do that D:<", ctx, 5)
-
     @list.error
     @child.error
     async def bot_channel_error(self, ctx, error):
         if isinstance(error, WrongChannel):
             await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
+        elif isinstance(error, commands.CommandInvokeError):
+            await helpers.message_handler("Missing arguments", ctx, 5)
+        else:
+            print(error.__cause__)
+
+    @quote.error
+    async def quote_delete_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await helpers.message_handler("You have no permissions to do that D:<", ctx, 5)
+        elif isinstance(error, commands.CommandInvokeError):
+            await helpers.message_handler("Missing arguments", ctx, 5)
+        else:
+            print(error.__cause__)
 
 
 def setup(bot):

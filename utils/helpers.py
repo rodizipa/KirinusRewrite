@@ -9,7 +9,7 @@ def checkdigitarguments(args, default):
 
 
 async def message_handler(message, ctx, time=30, embed=False, delete=True):
-    m = await ctx.send(embed=message) if embed else ctx.send(message)
+    m = await ctx.send(embed=message) if embed else await ctx.send(message)
     if delete:
         await sleep(0)
         await ctx.message.delete()

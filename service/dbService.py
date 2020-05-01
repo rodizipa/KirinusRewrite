@@ -21,8 +21,8 @@ class DatabaseService:
             await self.bot.db.execute(sql, *args, **kwargs)
         await self.releaseconnection()
 
-    async def fetchrow(self, sql, params):
-        return await self.bot.db.fetchrow(sql, params)
+    async def fetchrow(self, sql, *args, **kwargs):
+        return await self.bot.db.fetchrow(sql, *args, **kwargs)
 
-    async def fetch(self, sql, params=None):
-        return await self.bot.db.fetch(sql, params)
+    async def fetch(self, sql, *args, **kwargs):
+        return await self.bot.db.fetch(sql, *args, **kwargs)

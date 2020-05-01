@@ -2,7 +2,7 @@ from service.dbService import DatabaseService
 
 
 def gera_queryset(args):
-    query = {"query": '', }
+    query = {"query": "", }
     args = [arg.lower() for arg in args]
 
     for arg in args:
@@ -51,16 +51,17 @@ class ChildService(DatabaseService):
 
     async def find_similar_list(self, query):
         return await self.fetch("SELECT * FROM childs WHERE concat(child_call, alias1, alias2, name) similar to $1;",
-                                f"%{query}")
+                                f"%{query}%")
 
     async def find_list_units(self, args):
         query_set = gera_queryset(args)
-        records = await self.find_similar_list(query_set['query']) if query_set['query'] else await self.find_all()
+        records = await self.find_similar_list(query_set['query']) if query_set[
+                                                                          'query'] != "" else await self.find_all()
 
-        if query_set['element']:
+        if 'element' in query_set:
             records = [record for record in records if record['element'].lower() == query_set['element']]
-        if query_set['role']:
+        if 'role' in query_set:
             records = [record for record in records if record['role'].lower() == query_set['role']]
-        if query_set['rank']:
+        if 'rank' in query_set:
             records = [record for record in records if record['rank'].lower() == query_set['rank']]
         return records

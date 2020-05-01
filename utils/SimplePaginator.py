@@ -159,12 +159,6 @@ class SimplePaginator:
                 if self.embed is True:
                     if self.author:
                         page = discord.Embed(title=f'Page {index + 1}/{len(chunks)}', color=self.colour)
-                        if len(self.entries) == 2:
-                            page.set_author(name=f"{self.author.display_name}'s Lover", icon_url=self.author.avatar_url)
-                        else:
-                            page.set_author(name=f"{self.author.display_name}'s harem", icon_url=self.author.avatar_url)
-                        if self.favorite:
-                            page.set_thumbnail(url=self.favorite)
                     else:
                         page = discord.Embed(title=f'{self.title} - {index + 1}/{len(chunks)}', color=self.colour)
 
@@ -172,7 +166,7 @@ class SimplePaginator:
                     if self.footer:
                         page.set_footer(text=self.footer)
                 else:
-                    page = f"Page {index + 1}/{len(chunks)}\n {self.formmater(chunk)}"
+                    page = f"Page {index + 1}/{len(chunks)}\n\n{self.formmater(chunk)}"
                 self.pages.append(page)
 
             if not self.pages:

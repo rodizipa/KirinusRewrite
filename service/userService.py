@@ -1,4 +1,4 @@
-from service.dbservice import DatabaseService
+from service.dbService import DatabaseService
 
 
 class UserService(DatabaseService):

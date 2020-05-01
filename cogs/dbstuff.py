@@ -1,16 +1,14 @@
-import datetime
-
 import pendulum
 from discord import Embed
 from discord.ext import commands
 
 from service.alarmsService import AlarmService
 from service.childService import ChildService
+from service.quoteService import QuoteService
 from utils import formatter, SimplePaginator, helpers
 
 TORONTO_TIME = "America/Toronto"
 KR_TIME = 'Asia/Seoul'
-QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
 
 
 class WrongChannel(commands.CheckFailure):
@@ -48,6 +46,14 @@ async def generate_search_list(ctx, invoke_records):
                                           length=20, embed=False).paginate(ctx)
 
 
+async def quote_info_routine(ctx, quote):
+    if quote:
+        em = await formatter.quote_info(ctx, quote)
+        await helpers.message_handler(em, ctx, 20, embed=True)
+    else:
+        await helpers.message_handler("Try again when you know what you're searching for.", ctx, 20)
+
+
 class DbCog(commands.Cog):
     """Database stuff"""
 
@@ -55,6 +61,7 @@ class DbCog(commands.Cog):
         self.bot = bot
         self.alarmService = AlarmService(self.bot)
         self.childService = ChildService(self.bot)
+        self.quoteService = QuoteService(self.bot)
 
     async def add_alarm_routine(self, ctx, row, alarm, time, display_name):
         if row:
@@ -64,9 +71,26 @@ class DbCog(commands.Cog):
             await self.alarmService.insert_alarm(alarm, time)
             await helpers.message_handler(f"{display_name} time created.", ctx, 5)
 
+    async def quote_add_routine(self, ctx, args, quote):
+        if quote:
+            await self.quoteService.update_quote(ctx, args)
+            await helpers.message_handler("Tag updated", ctx, 5)
+        else:
+            await self.quoteService.insert_quote(ctx, args)
+            await helpers.message_handler("Tag created", ctx, 5)
+
+    @commands.is_owner()
+    async def quote_delete_routine(self, ctx, invoke, quote):
+        if quote:
+            await self.quoteService.delete_quote(invoke)
+            await helpers.message_handler("Tag Removed.", ctx, 5)
+        else:
+            await helpers.message_handler("Come back when you know what You're doing.", ctx, 5)
+
     @bot_channel()
     @commands.command(name='list')
     async def list(self, ctx, *args):
+        """List search terms by name, role, element, rank. `?list davi [optional fields: fire attacker 3]`"""
         if args:
             invoke_records = await self.childService.find_list_units(args)
             if invoke_records:
@@ -77,51 +101,28 @@ class DbCog(commands.Cog):
             invoke_records = await self.childService.list_all_keywords()
             await generate_search_list(ctx, invoke_records)
 
+    @bot_channel()
     @commands.command(name='child')
     async def child(self, ctx, *, child_call: str):
         """Search child info in database. Arguments: <child name>"""
+        row = await self.childService.find_one_similar(child_call)
 
-        if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            row = await self.bot.db.fetchrow(
-                "SELECT * FROM childs where similarity($1, child_call) > 0.8 ORDER BY $1 <-> child_call LIMIT 1",
-                child_call.lower())
-            # Checks if we got result or if we need to list:
-            if row:
-                em = await formatter.child_embed(row)
-                await ctx.send(embed=em)
-            else:
-                row = await self.bot.db.fetchrow(
-                    "SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY $1 <-> alias1 LIMIT 1",
-                    child_call.lower())
-                if row:
-                    em = await formatter.child_embed(row)
-                    await ctx.send(embed=em)
-                else:
-                    row = await self.bot.db.fetchrow(
-                        "SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY $1 <-> alias2 LIMIT 1",
-                        child_call.lower())
-                    if row:
-                        em = await formatter.child_embed(row)
-                        await ctx.send(embed=em)
-                    else:
-                        rows = await self.bot.db.fetch(
-                            "select * from childs where similarity($1, child_call) > 0.3 or similarity($1, alias1) > 0.3 or similarity($1, alias2) > 0.3 order by $1 <-> child_call LIMIT 5",
-                            child_call.lower())
-                        description = "Child not found. Try using `?list` like `?list fire` or `?list mona`.\n"
-                        if rows:
-                            description = f"{description}\n**Possible matches:**\n"
-                            for row in rows:
-                                name = f"\n * **{row['name']}**: Use `{row['child_call']}`"
-                                if row['alias1']:
-                                    name = f"{name}, `{row['alias1']}`"
-                                if row['alias2']:
-                                    name = f"{name} or `{row['alias2']}`"
-                                description = f"{description} {name}\n"
-
-                        em = Embed(description=description)
-                        await ctx.send(embed=em)
+        if row:
+            em = await formatter.child_embed(row)
         else:
-            await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
+            rows = await self.childService.find_five_similar(child_call)
+            description = "Child not found. Try using `?list` like `?list fire` or `?list mona`.\n"
+            if rows:
+                description = f"{description}\n**Possible matches:**\n"
+                for row in rows:
+                    unit = f"\n * **{row['name']}**: Use `{row['child_call']}`"
+                    if row['alias1']:
+                        unit = unit + f", `{row['alias1']}`"
+                    if row['alias2']:
+                        unit = unit + " or `{row['alias2']}`"
+                    description = f"{description} {unit}\n"
+            em = Embed(description=description)
+        await ctx.send(embed=em)
 
     @commands.command(name='quote', aliases=['tag'])
     async def quote(self, ctx, *args):
@@ -129,75 +130,23 @@ class DbCog(commands.Cog):
         Alias: tag.
         Use: Adding tags: <add> <tagname> <content>. Check tag info: <info> <tag>. Tag search: <tag>
          """
-
-        # List the Quotes in the paginator
-
         if not args or args[0] in ('list', 'help'):
-            query = "SELECT invoke FROM quotes"
-            invoke_records = await self.bot.db.fetch(query)
-            invoke_list = []
-            for item in invoke_records:
-                invoke_list.append(item['invoke'])
-            await SimplePaginator.SimplePaginator(entries=invoke_list, title='Kirinus Quote List', length=20,
-                                                  dm=True).paginate(ctx)
+            invoke_records = await self.quoteService.find_all()
+            await SimplePaginator.SimplePaginator(entries=[item['invoke'] for item in invoke_records],
+                                                  title='Kirinus Quote List', length=20, dm=True).paginate(ctx)
             await ctx.message.delete()
+            return
 
-        # Add or update Tag
-        elif args[0] == 'add':
-            query = QUOTES_WHERE_INVOKE_
-            row = await self.bot.db.fetchrow(query, args[1])
-            connection = await self.bot.db.acquire()
-
-            if row:
-                async with connection.transaction():
-                    update = "UPDATE quotes SET text = $1, created_at = $2, user_id = $3, created_by = $4 WHERE invoke = $5;"
-                    await self.bot.db.execute(update, args[2], datetime.datetime.now(), ctx.author.id,
-                                              ctx.author.display_name, args[1])
-                await self.bot.db.release(connection)
-                await helpers.message_handler("Tag updated.", ctx, 5)
-            else:
-                async with connection.transaction():
-                    insert = "INSERT INTO quotes (invoke, text, created_by, created_at, user_id) VALUES ($1, $2, $3, $4, $5);"
-                    await self.bot.db.execute(insert, args[1], args[2], ctx.author.name, datetime.datetime.now(),
-                                              ctx.author.id)
-                await self.bot.db.release(connection)
-                await helpers.message_handler("Tag created", ctx, 5)
-
-
-        # Tag Info
+        quote = await self.quoteService.find_one(args[1])
+        if args[0] == 'add':
+            await self.quote_add_routine(ctx, args, quote)
         elif args[0] == 'info':
-            query = QUOTES_WHERE_INVOKE_
-            row = await self.bot.db.fetchrow(query, args[1])
-
-            if row:
-                em = await formatter.quote_info(ctx, row)
-                await helpers.message_handler(em, ctx, 20, embed=True)
-            else:
-                await helpers.message_handler("Try again when you know what you're searching for.", ctx, 20)
-
-        # Removes tag
+            await quote_info_routine(ctx, quote)
         elif args[0] == 'remove':
-            if ctx.author.id == 114010253938524167:
-                query = QUOTES_WHERE_INVOKE_
-                row = await self.bot.db.fetchrow(query, args[1])
-
-                if row:
-                    connection = await self.bot.db.acquire()
-                    async with connection.transaction():
-                        insert = "DELETE FROM quotes WHERE invoke = $1"
-                        await self.bot.db.execute(insert, args[1])
-                    await self.bot.db.release(connection)
-                    await helpers.message_handler("Tag Removed.", ctx, 5)
-                else:
-                    await helpers.message_handler("Come back when you know what You're doing.", ctx, 5)
-            else:
-                await helpers.message_handler("You have no permissions to do that D:<", ctx, 5)
+            await self.quote_delete_routine(ctx, args[1], quote)
         else:
-            # Find item
-            query = QUOTES_WHERE_INVOKE_
-            row = await self.bot.db.fetchrow(query, args[0])
-            if row:
-                em = await formatter.quote_embed(row)
+            if quote:
+                em = await formatter.quote_embed(quote)
                 em.set_footer(text="Invoked by: " + ctx.author.display_name)
                 await helpers.message_handler(em, ctx, embed=True, delete=False)
             else:
@@ -273,7 +222,12 @@ class DbCog(commands.Cog):
         if isinstance(error, WrongChannel):
             await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
 
+    @quote_delete_routine.error
+    async def quote_delete_error(self, ctx, error):
+        await helpers.message_handler("You have no permissions to do that D:<", ctx, 5)
+
     @list.error
+    @child.error
     async def bot_channel_error(self, ctx, error):
         if isinstance(error, WrongChannel):
             await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)

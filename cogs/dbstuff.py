@@ -38,6 +38,7 @@ def bot_channel():
 def admin_check(ctx):
     return True if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167 else False
 
+
 async def generate_search_list(ctx, invoke_records):
     result_list = [f"{'Name':<25} Search Terms", ""]
     for item in invoke_records:

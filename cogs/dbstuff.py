@@ -38,16 +38,10 @@ def bot_channel():
 def admin_check(ctx):
     return True if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167 else False
 
-
 async def generate_search_list(ctx, invoke_records):
     result_list = [f"{'Name':<25} Search Terms", ""]
     for item in invoke_records:
-        search = f"{item['child_call']}"
-        if item['alias1']:
-            search = search + f",{item['alias1']}"
-        if item['alias2']:
-            search = search + f",{item['alias2']}"
-
+        search = f"{item['child_call']} {item.get('alias1', '')} {item.get('alias2', '')}"
         result_list.append(f" {item['name']:<26}{search}")
     await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                           length=20, embed=False).paginate(ctx)
@@ -74,14 +68,8 @@ class DbCog(commands.Cog):
     async def list(self, ctx, *args):
         if args:
             invoke_records = await self.childService.find_list_units(args)
-
             if invoke_records:
-                result_list = [f"{'Name':<30}Search Term", ""]
-                for item in invoke_records:
-                    terms = f"{item['child_call']} {item.get('alias1', '')} {item.get('alias2', '')}"
-                    result_list.append(f" {item['name']:<30}{terms}")
-                await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
-                                                      length=20, embed=False).paginate(ctx)
+                await generate_search_list(ctx, invoke_records)
             else:
                 await ctx.send('No results. Need help? <https://rodizipa.github.io/KirinusRewrite/#list>')
         else:

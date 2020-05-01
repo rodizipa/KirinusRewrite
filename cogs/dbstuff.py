@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 
 import pendulum
@@ -6,6 +5,7 @@ from discord import Embed
 from discord.ext import commands
 
 from service.alarmsService import AlarmService
+from service.childService import ChildService
 from utils import formatter, SimplePaginator, helpers
 
 TORONTO_TIME = "America/Toronto"
@@ -16,11 +16,21 @@ QUOTES_WHERE_INVOKE_ = "SELECT * FROM quotes WHERE $1 = invoke;"
 class WrongChannel(commands.CheckFailure):
     pass
 
+
 def auction_channel():
     async def predicate(ctx):
-        if ctx.message.channel.id == 529546837661581312 or ctx.message.channel.id == 650512639012634626:
+        if ctx.message.channel.id in (529546837661581312, 650512639012634626):
             return True
         raise WrongChannel('Wrong channel mate, only in waifu gacha.')
+
+    return commands.check(predicate)
+
+
+def bot_channel():
+    async def predicate(ctx):
+        if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
+            return True
+        raise WrongChannel('You cannot use this cmd outside of bot channels.')
 
     return commands.check(predicate)
 
@@ -29,12 +39,27 @@ def admin_check(ctx):
     return True if ctx.author.id == 224522663626801152 or ctx.author.id == 114010253938524167 else False
 
 
+async def generate_search_list(ctx, invoke_records):
+    result_list = [f"{'Name':<25} Search Terms", ""]
+    for item in invoke_records:
+        search = f"{item['child_call']}"
+        if item['alias1']:
+            search = search + f",{item['alias1']}"
+        if item['alias2']:
+            search = search + f",{item['alias2']}"
+
+        result_list.append(f" {item['name']:<26}{search}")
+    await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
+                                          length=20, embed=False).paginate(ctx)
+
+
 class DbCog(commands.Cog):
     """Database stuff"""
 
     def __init__(self, bot):
         self.bot = bot
         self.alarmService = AlarmService(self.bot)
+        self.childService = ChildService(self.bot)
 
     async def add_alarm_routine(self, ctx, row, alarm, time, display_name):
         if row:
@@ -44,80 +69,24 @@ class DbCog(commands.Cog):
             await self.alarmService.insert_alarm(alarm, time)
             await helpers.message_handler(f"{display_name} time created.", ctx, 5)
 
+    @bot_channel()
     @commands.command(name='list')
     async def list(self, ctx, *args):
-        if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            query_set = {
-                "query": '',
-                "element": None,
-                "rank": None,
-                "role": None,
-            }
+        if args:
+            invoke_records = await self.childService.find_list_units(args)
 
-            if args:
-                for arg in args:
-                    if arg.lower() in ("water", "fire", "forest", "dark", "light"):
-                        query_set['element'] = arg.lower()
-                    elif arg.lower() in ("attacker", "debuffer", "tank", "healer", "support"):
-                        query_set['role'] = arg.lower()
-                    elif arg.lower() in ("5", "4", "3"):
-                        query_set['rank'] = arg
-                    else:
-                        if query_set['query'] == '':
-                            query_set['query'] = arg.lower()
-                        else:
-                            query_set['query'] = query_set['query'] + f' {arg}'.lower()
-
-                if query_set['query'] != '':
-                    query = "SELECT * FROM childs WHERE concat(child_call, alias1, alias2, name) similar to $1;"
-                    invoke_records = await self.bot.db.fetch(query, f"%{query_set['query']}%")
-                else:
-                    query = f"SELECT * FROM childs;"
-                    invoke_records = await self.bot.db.fetch(query)
-
-                if query_set['element']:
-                    invoke_records = [tup for tup in invoke_records if (tup['element'].lower() == query_set['element'])]
-
-                if query_set['role']:
-                    invoke_records = [tup for tup in invoke_records if (tup['role'].lower() == query_set['role'])]
-
-                if query_set['rank']:
-                    invoke_records = [tup for tup in invoke_records if (tup['rank'] == query_set['rank'])]
-
-                if invoke_records:
-                    # list results
-                    result_list = [f"{'Name':<30}Search Term", ""]
-                    for item in invoke_records:
-                        terms = item['child_call']
-                        if item['alias1']:
-                            terms = f"{terms}, {item['alias1']}"
-                        if item['alias2']:
-                            terms = f"{terms}, {item['alias2']}"
-                        result_list.append(f" {item['name']:<30}{terms}")
-                    await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
-                                                          length=20, embed=False).paginate(ctx)
-
-                else:
-                    await ctx.send('No results. Need help? <https://rodizipa.github.io/KirinusRewrite/#list>')
-            else:
-                # List all childs
-                query = "SELECT child_call, alias1, alias2, name FROM childs"
-                invoke_records = await self.bot.db.fetch(query)
-                result_list = [f"{'Name':<25} Search Terms", ""]
+            if invoke_records:
+                result_list = [f"{'Name':<30}Search Term", ""]
                 for item in invoke_records:
-                    search = f"{item['child_call']}"
-                    if item['alias1']:
-                        search = search + f",{item['alias1']}"
-                    if item['alias2']:
-                        search = search + f",{item['alias2']}"
-
-                    result_list.append(f" {item['name']:<26}{search}")
+                    terms = f"{item['child_call']} {item.get('alias1', '')} {item.get('alias2', '')}"
+                    result_list.append(f" {item['name']:<30}{terms}")
                 await SimplePaginator.SimplePaginator(entries=result_list, title='Results matching the criteria.',
                                                       length=20, embed=False).paginate(ctx)
-            await asyncio.sleep(5)
-            await ctx.message.delete()
+            else:
+                await ctx.send('No results. Need help? <https://rodizipa.github.io/KirinusRewrite/#list>')
         else:
-            await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
+            invoke_records = await self.childService.list_all_keywords()
+            await generate_search_list(ctx, invoke_records)
 
     @commands.command(name='child')
     async def child(self, ctx, *, child_call: str):
@@ -204,6 +173,7 @@ class DbCog(commands.Cog):
                                               ctx.author.id)
                 await self.bot.db.release(connection)
                 await helpers.message_handler("Tag created", ctx, 5)
+
 
         # Tag Info
         elif args[0] == 'info':
@@ -313,6 +283,11 @@ class DbCog(commands.Cog):
     async def auction_error(self, ctx, error):
         if isinstance(error, WrongChannel):
             await helpers.message_denied("Wrong channel mate, only in waifu gacha.", ctx, pm=True)
+
+    @list.error
+    async def bot_channel_error(self, ctx, error):
+        if isinstance(error, WrongChannel):
+            await helpers.message_denied("Don't use this cmd outside of bot channels.", ctx, pm=True)
 
 
 def setup(bot):

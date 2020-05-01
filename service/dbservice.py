@@ -1,6 +1,6 @@
 
 class DatabaseService:
-
+    """Basic database manipulations for abstractions"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,3 +23,6 @@ class DatabaseService:
 
     async def fetchrow(self, sql, params):
         return await self.bot.db.fetchrow(sql, params)
+
+    async def fetch(self, sql, params=None):
+        return await self.bot.db.fetch(sql, params)

@@ -280,7 +280,6 @@ class AdminCog(commands.Cog):
             await ctx.send(f"{user.mention}")
             await asyncio.sleep(0)
 
-    @is_admin()
     @commands.command(name='selfdestruct', aliases=['sd'], pass_context=True)
     async def selfdestruct(self, ctx, amount):
         """Explodes the last message after a time"""

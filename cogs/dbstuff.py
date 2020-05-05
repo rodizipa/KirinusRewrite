@@ -6,13 +6,10 @@ from service.alarmsService import AlarmService
 from service.childService import ChildService
 from service.quoteService import QuoteService
 from utils import formatter, SimplePaginator, helpers
+from utils.helpers import WrongChannel
 
 TORONTO_TIME = "America/Toronto"
 KR_TIME = 'Asia/Seoul'
-
-
-class WrongChannel(commands.CheckFailure):
-    pass
 
 
 def auction_channel():
@@ -20,16 +17,6 @@ def auction_channel():
         if ctx.message.channel.id in (529546837661581312, 650512639012634626):
             return True
         raise WrongChannel('Wrong channel mate, only in waifu gacha.')
-
-    return commands.check(predicate)
-
-
-def bot_channel():
-    async def predicate(ctx):
-        if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
-            return True
-        raise WrongChannel('You cannot use this cmd outside of bot channels.')
-
     return commands.check(predicate)
 
 
@@ -91,7 +78,7 @@ class DbCog(commands.Cog):
         else:
             await helpers.message_handler("Come back when you know what You're doing.", ctx, 5)
 
-    @bot_channel()
+    @helpers.bot_channel()
     @commands.command(name='list')
     async def list(self, ctx, *args):
         """List search terms by name, role, element, rank. `?list davi [optional fields: fire attacker 3]`"""
@@ -105,7 +92,7 @@ class DbCog(commands.Cog):
             invoke_records = await self.childService.list_all_keywords()
             await generate_search_list(ctx, invoke_records)
 
-    @bot_channel()
+    @helpers.bot_channel()
     @commands.command(name='child')
     async def child(self, ctx, *, child_call: str):
         """Search child info in database. Arguments: <child name>"""

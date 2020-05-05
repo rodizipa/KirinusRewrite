@@ -1,5 +1,20 @@
 from asyncio import sleep
 
+from discord.ext import commands
+
+
+class WrongChannel(commands.CheckFailure):
+    pass
+
+
+def bot_channel():
+    async def predicate(ctx):
+        if ctx.message.channel.id in (167280538695106560, 360916876986941442, 378255860377452545, 458755509890056222):
+            return True
+        raise WrongChannel('You cannot use this cmd outside of bot channels.')
+
+    return commands.check(predicate)
+
 
 def checkdigitarguments(args, default):
     for item in args:

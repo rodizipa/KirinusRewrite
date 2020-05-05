@@ -5,119 +5,11 @@ import discord
 from discord import Embed
 from discord.ext import commands
 
-from utils import formatter
+from utils import formatter, helpers
 
 coinFlip = [
     'https://cdn.discordapp.com/attachments/448341812055244817/448502226021908490/coinsmalltails.png',
     'https://cdn.discordapp.com/attachments/448341812055244817/448502223589212160/coinsmall.png'
-]
-
-five_stars = [
-    "bastet",
-    "mafdet",
-    "charles",
-    "ashtoreth",
-    "cleopatra",
-    "hildr",
-    "cube_moa",
-    "apep",
-    "nirrti",
-    "aria",
-    "sitri",
-    "luna",
-    "neptune",
-    "diablo",
-    "dana",
-    "horus",
-    "maat",
-    "venus",
-    "elizabeth",
-    "kubaba",
-    "frey",
-    "yan",
-    "d_maat",
-    "mars",
-    "lanfei",
-    "rita",
-    "pantheon",
-    "semele",
-    "warwolf",
-    "ai",
-    "redcross",
-    "medusa",
-    "metis",
-    "hestia",
-    "medb",
-    "saladin",
-    "morgan",
-    "tyrfing",
-    "demeter",
-    "jupiter",
-    "hermes",
-    "red_queen",
-    "verdel",
-    "hades",
-    "dinashi",
-    "aurora",
-    "deino",
-    "thanatos",
-    "eve",
-    "bari",
-    "d_lisa",
-    "saturn",
-    "wola",
-    "santa",
-    "babel",
-    "myrina",
-    "isolde",
-    "naias",
-    "sang_ah",
-    "willow",
-    "anemone",
-    "ymir",
-    "maris",
-    "eshu",
-    "rusalka",
-    "siren",
-    "gd_sang_ah",
-    "abaddon",
-    "nicole",
-    "krampus",
-    "jcb",
-    "daphnis",
-    "midas",
-    "ruin",
-    "epona",
-    "hera",
-    "mammon",
-    "brownie",
-    "newbie_mona",
-    "bathory",
-    "syrinx",
-    "astrea",
-    "myra",
-    "diver mona",
-    "summer lisa",
-    "summer davi",
-    "iphis",
-    "pomona"
-]
-
-world_bosses = [
-    'Aria',
-    'Cleo',
-    'Apep',
-    'Isolde',
-    'Khepri',
-    'Nicole',
-    'Thetis',
-    'Demeter',
-    'Rita',
-    'Slime',
-    'Morgan',
-    'Krampus',
-    'Bari',
-    'Iphis'
 ]
 
 quotes = [
@@ -165,34 +57,35 @@ class FunCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='8ball')
+    @helpers.bot_channel()
+    @commands.command('8ball')
     async def eight_ball(self, ctx):
         """Ask the great 8ball for answer."""
+        await ctx.send(random.choice(quotes))
 
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
-            await ctx.send(random.choice(quotes))
-        else:
-            await ctx.message.delete()
-            await ctx.author.send("My mystical ball only works on channels with rich magic like`i-am-bot`")
+    @eight_ball.error
+    async def eight_ball_error(self, ctx, error):
+        if isinstance(error, helpers.WrongChannel):
+            await helpers.message_denied("My mystical ball only works on channels with rich magic like`i-am-bot`", \
+                                         ctx, True)
 
+    @helpers.bot_channel()
     @commands.command(name='choose', aliases=['choice', 'pick'])
     async def choose(self, ctx, *, args):
         """Choose one or another args:<option> , <option2> [, <option3>...]"""
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
-            split_message = args.split(',')
-            await ctx.send(random.choice(split_message))
-        else:
-            await ctx.message.delete()
-            await ctx.author.send("This command is locked to `i-am-bot`.")
+        split_message = args.split(',')
+        await ctx.send(random.choice(split_message))
+
+    @choose.error
+    async def choose_error(self, ctx, error):
+        if isinstance(error, helpers.WrongChannel):
+            await helpers.message_denied("This command is locked to `i-am-bot`.", ctx, True)
 
     @commands.command(name='coin', aliases=['flip'])
     async def flip_coin(self, ctx):
         """Flip a coin."""
         em = await formatter.coin_embed(random.choice(coinFlip))
-        m = await ctx.send(embed=em)
-        await asyncio.sleep(8)
-        await ctx.message.delete()
-        await m.delete()
+        await helpers.message_handler(em, ctx, 8, True)
 
     @commands.command(name='slap')
     async def slap(self, ctx, mention: discord.Member):
@@ -201,48 +94,37 @@ class FunCog(commands.Cog):
         await ctx.send(embed=em)
         await ctx.message.delete()
 
-    @commands.command(name='gacha', aliases=['gatcha'])
-    async def gacha(self, ctx, *args):
-        """Chooses a random 5* that can be get from gacha. args: [wb]"""
-        if args:
-            if args[0] == 'wb':
-                em = Embed(description=ctx.author.display_name + " thinks that the world boss will be " + random.choice(
-                    world_bosses))
-        else:
-            em = Embed(description=ctx.author.display_name + " guessed " + random.choice(five_stars))
-        await ctx.send(embed=em)
-        await ctx.message.delete()
-
     @commands.command(name="insult")
     async def insult(self, ctx):
         await formatter.random_insult(ctx)
 
-    @commands.command(name='user', aliases=['userinfo', 'info', 'ui', 'uinfo'])
-    @commands.guild_only()
-    async def user_info(self, ctx, *args):
+    @helpers.bot_channel()
+    @commands.command(name='userinfo', aliases=['info', 'ui', 'uinfo'])
+    async def user_information(self, ctx, *args):
         """returns mentioned user info. Aliases: userinfo, info, ui, uinfo"""
-        if ctx.message.channel.id == 167280538695106560 or ctx.message.channel.id == 360916876986941442:
-            if args:
-                user = ctx.message.mentions[0]
-            else:
-                user = ctx.author
+        user = ctx.message.mentions[0] if args else ctx.author
 
-            if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
-                avi = user.avatar_url.rsplit("?", 1)[0]
-            else:
-                avi = user.avatar_url_as(static_format='png')
-
-            em = Embed(timestamp=ctx.message.created_at)
-            em.add_field(name='Nick', value=user.display_name, inline=False)
-            em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
-            em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
-            em.set_thumbnail(url=avi)
-            em.set_footer(text=f'Invoked by: {ctx.author.display_name}')
-            await ctx.message.delete()
-            await ctx.send(embed=em)
+        if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
+            avi = user.avatar_url.rsplit("?", 1)[0]
         else:
-            await ctx.message.delete()
-            await ctx.author.send("Don't use it outside of bot channel.")
+            avi = user.avatar_url_as(static_format='png')
+
+        em = Embed(timestamp=ctx.message.created_at)
+        em.add_field(name='Nick', value=user.display_name, inline=False)
+        em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
+        em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
+        em.set_thumbnail(url=avi)
+        em.set_footer(text=f'Invoked by: {ctx.author.display_name}')
+        await ctx.message.delete()
+        await ctx.send(embed=em)
+
+    @user_information.error
+    async def user_info(self, ctx, error):
+        if isinstance(error, helpers.WrongChannel):
+            await helpers.message_denied("Don't use it outside of bot channel.", ctx, True)
+        else:
+            await ctx.send(error.__cause__)
+            print(error.__cause__)
 
     @commands.command(name="poll", aliases=['p'])
     async def poll(self, ctx, *, msg):
@@ -256,15 +138,12 @@ class FunCog(commands.Cog):
 
         if time:
             time = time[0]
-        if time:
             options.remove(time)
 
         if (len(options) < 3) or (len(options) > 11):
             return await ctx.send("Min 2 options, Max 9.")
-        if time:
-            time = int(time.strip("time="))
-        else:
-            time = 60
+
+        time = int(time.strip("time=")) if time else 60
 
         emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
         to_react = []
@@ -328,34 +207,6 @@ class FunCog(commands.Cog):
         await ctx.send(embed=em)
         await asyncio.sleep(1)
         await ctx.message.delete()
-
-    @commands.command(name="saveusers")
-    async def saveusers(self, ctx):
-
-        members = []
-        members = ctx.guild.members
-        connection = await ctx.bot.db.acquire()
-
-        for member in members:
-            await ctx.bot.db.execute('insert into aprils_fools(userid, displaynick) VALUES($1,$2)', member.id,
-                                     member.display_name)
-
-        await ctx.bot.db.release(connection)
-
-    @commands.command(name="nickrestore")
-    async def nick_restore(self, ctx):
-        query = "SELECT * FROM aprils_fools"
-        members = await self.bot.db.fetch(query)
-
-        for member in members:
-            user = ctx.guild.get_member(member['userid'])
-            if member:
-                try:
-                    await user.edit(nick=member['displaynick'])
-                    print(f"{member['displaynick']} restored!")
-                except:
-                    pass
-                await asyncio.sleep(0.1)
 
 
 def setup(bot):

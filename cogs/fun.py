@@ -98,16 +98,12 @@ class FunCog(commands.Cog):
     async def insult(self, ctx):
         await formatter.random_insult(ctx)
 
-    @helpers.bot_channel()
     @commands.command(name='userinfo', aliases=['info', 'ui', 'uinfo'])
-    async def user_information(self, ctx, *args):
+    async def user_information(self, ctx, *, member: discord.Member = None):
         """returns mentioned user info. Aliases: userinfo, info, ui, uinfo"""
-        user = ctx.message.mentions[0] if args else ctx.author
+        user = member if member else ctx.author
 
-        if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
-            avi = user.avatar_url.rsplit("?", 1)[0]
-        else:
-            avi = user.avatar_url_as(static_format='png')
+        avi = user.avatar_url
 
         em = Embed(timestamp=ctx.message.created_at)
         em.add_field(name='Nick', value=user.display_name, inline=False)

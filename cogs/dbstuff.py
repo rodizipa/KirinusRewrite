@@ -140,7 +140,7 @@ class DbCog(commands.Cog):
             if quote:
                 em = await formatter.quote_embed(quote)
                 em.set_footer(text="Invoked by: " + ctx.author.display_name)
-                await helpers.message_handler(em, ctx, embed=True, delete=False)
+                await helpers.message_handler(em, ctx, embed=True, deleteresponse=False)
             else:
                 await helpers.message_handler("Quote not found.", ctx, 5)
 

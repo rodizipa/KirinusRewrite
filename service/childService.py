@@ -35,11 +35,11 @@ class ChildService(DatabaseService):
         row = await self.fetchrow("SELECT * FROM childs where similarity($1, child_call) > 0.8 ORDER BY \
          $1 <-> child_call LIMIT 1", child_call)
         if not row:
-            await self.fetchrow("SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY \
-             $1 <-> alias1 LIMIT 1", child_call)
+            row = await self.fetchrow("SELECT * FROM childs WHERE similarity($1, alias1) > 0.8 ORDER BY \
+            $1 <-> alias1 LIMIT 1", child_call)
         if not row:
-            await self.fetchrow("SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY \
-             $1 <-> alias2 LIMIT 1", child_call)
+            row = await self.fetchrow("SELECT * FROM childs WHERE similarity($1, alias2) > 0.8 ORDER BY \
+            $1 <-> alias2 LIMIT 1", child_call)
 
         return row if row else None
 

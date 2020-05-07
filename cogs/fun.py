@@ -110,7 +110,7 @@ class FunCog(commands.Cog):
         em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
         em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y  %H:%M:%S'))
         em.set_thumbnail(url=avi)
-        em.set_footer(text=f'Invoked by: {ctx.author.display_name}')
+        em.set_footer(text=f'Invoked by: {ctx.author.display_name}', icon_url=ctx.author.avatar_url)
         await ctx.message.delete()
         await ctx.send(embed=em)
 

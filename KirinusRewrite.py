@@ -19,7 +19,6 @@ class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(command_prefix=CONFIG.PREFIX, description="Destiny Child KR bot.", intents=intents)
         self.__db = kwargs.pop("db")
-        self.__rt = self.loop.create_task(self.reset_task())
         self.__roleService = RoleService(self)
 
     @property
@@ -33,10 +32,6 @@ class Bot(commands.Bot):
     async def on_command_completion(self, ctx):
         print(
             f'[{pendulum.now(tz="UTC").to_datetime_string()}] [Command] {ctx.message.content} by {ctx.author.name}')
-
-    async def reset_task(self):
-        """Rework to Alexandria System"""
-        pass
 
     async def on_ready(self):
         print(f'{self.user.name} online!')

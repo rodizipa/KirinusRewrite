@@ -1,4 +1,5 @@
 import asyncio
+import typing
 
 import discord
 import pendulum
@@ -306,6 +307,18 @@ class AdminCog(commands.Cog):
         await asyncio.sleep(1)
         await killmsg.delete()
         await msg.delete()
+
+    @commands.is_owner()
+    @commands.command(name='addreactionrole')
+    async def addreactionrole(self, ctx, emote: typing.Union[discord.Emoji, discord.PartialEmoji, str],
+                              role: discord.Role):
+        await self.bot.roleService.update_reaction_role(emote, role) if await self.bot.roleService.find_reaction_role(
+            emote) else await self.bot.roleService.add_reaction_role(emote, role)
+
+    @commands.is_owner()
+    @commands.command(name='deletereactionrole')
+    async def deletereactionrole(self, emote: typing.Union[discord.Emoji, discord.PartialEmoji, str]):
+        await self.bot.roleService.remove_reaction_role(emote)
 
 
 def setup(bot):
